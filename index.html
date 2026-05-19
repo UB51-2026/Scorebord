@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Live Score App</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app">
+    <section class="card">
+      <h1>⚽ Live Score</h1>
+
+      <div class="grid">
+        <label>
+          Team A / Thuis
+          <select id="teamA"></select>
+        </label>
+
+        <label>
+          Team B / Tegenstander
+          <select id="teamB"></select>
+        </label>
+      </div>
+
+      <div class="scoreboard">
+        <div id="teamAName">Team A</div>
+        <div class="score">
+          <span id="scoreA">0</span>
+          <span>-</span>
+          <span id="scoreB">0</span>
+        </div>
+        <div id="teamBName">Team B</div>
+      </div>
+
+      <div class="timer">
+        <div id="status">Nog niet gestart</div>
+        <div id="minute">0'</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Wedstrijd</h2>
+      <div class="buttons">
+        <button onclick="startMatch()">▶ Start wedstrijd</button>
+        <button onclick="halfTime()">⏸ Rust</button>
+        <button onclick="startSecondHalf()">▶ Start 2e helft</button>
+        <button onclick="endMatch()">🏁 Einde wedstrijd</button>
+        <button class="danger" onclick="resetMatch()">🔄 Reset wedstrijd</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Acties</h2>
+
+      <label>
+        Doelpuntenmaker Ulftse Boys
+        <select id="playerSelect"></select>
+      </label>
+
+      <div class="buttons">
+        <button class="goal" onclick="goalTeamA()">⚽ Goal Team A</button>
+        <button class="danger" onclick="goalTeamB()">⚽ Goal Team B</button>
+      </div>
+
+      <div class="grid">
+        <label>
+          Speler eruit
+          <select id="playerOut"></select>
+        </label>
+
+        <label>
+          Speler erin
+          <select id="playerIn"></select>
+        </label>
+      </div>
+
+      <button onclick="substitution()">🔁 Wissel Ulftse Boys</button>
+    </section>
+
+    <section class="card">
+      <h2>Bericht preview</h2>
+      <pre id="messagePreview">Nog geen bericht.</pre>
+
+      <div id="photoPreviewWrap" class="photo-wrap hidden">
+        <img id="photoPreview" alt="Spelerfoto preview" />
+      </div>
+
+      <button class="share" onclick="shareWhatsApp()">📤 Deel via WhatsApp</button>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
