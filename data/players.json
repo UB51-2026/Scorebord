@@ -1,0 +1,14 @@
+[
+  {
+    "id": "Jesse",
+    "naam": "Jesse Reintjes",
+    "teamId": "UB",
+    "foto": "images/spelers/jesse-reintjes.png"
+  },
+  {
+    "id": "Marijn",
+    "naam": "Marijn vd H",
+    "teamId": "UB",
+    "foto": "images/spelers/piet-de-vries.png"
+  }
+]
