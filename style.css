@@ -164,3 +164,24 @@ pre {
 .hidden {
   display: none;
 }
+
+.match-info {
+  text-align: center;
+  margin-bottom: 14px;
+  background: #edf7f0;
+  border-radius: 16px;
+  padding: 10px;
+}
+
+#currentDate {
+  font-size: 15px;
+  font-weight: bold;
+  color: #006b35;
+}
+
+#currentClock {
+  font-size: 24px;
+  font-weight: bold;
+  color: #003d20;
+  margin-top: 4px;
+}

@@ -334,3 +334,24 @@ async function shareWhatsApp() {
     alert("Delen lukte niet. Het bericht is gekopieerd.");
   }
 }
+
+function updateClock() {
+  const now = new Date();
+
+  const dateOptions = {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric"
+  };
+
+  const dateString = now.toLocaleDateString("nl-NL", dateOptions);
+
+  const timeString = now.toLocaleTimeString("nl-NL");
+
+  document.getElementById("currentDate").textContent = dateString;
+  document.getElementById("currentClock").textContent = timeString;
+}
+
+setInterval(updateClock, 1000);
+updateClock();
