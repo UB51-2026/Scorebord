@@ -20,6 +20,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   updateTeamNames();
   loadOwnClubPlayers();
   startTimerDisplay();
+
+  updateClock();
+  setInterval(updateClock, 1000);
 });
 
 async function loadData() {
@@ -336,6 +339,13 @@ async function shareWhatsApp() {
 }
 
 function updateClock() {
+  const currentDateElement = document.getElementById("currentDate");
+  const currentClockElement = document.getElementById("currentClock");
+
+  if (!currentDateElement || !currentClockElement) {
+    return;
+  }
+
   const now = new Date();
 
   const dateOptions = {
@@ -345,13 +355,6 @@ function updateClock() {
     year: "numeric"
   };
 
-  const dateString = now.toLocaleDateString("nl-NL", dateOptions);
-
-  const timeString = now.toLocaleTimeString("nl-NL");
-
-  document.getElementById("currentDate").textContent = dateString;
-  document.getElementById("currentClock").textContent = timeString;
+  currentDateElement.textContent = now.toLocaleDateString("nl-NL", dateOptions);
+  currentClockElement.textContent = now.toLocaleTimeString("nl-NL");
 }
-
-setInterval(updateClock, 1000);
-updateClock();
