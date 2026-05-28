@@ -112,5 +112,29 @@
     "naam": "Kees Weijers",
     "teamId": "UB",
     "foto": "images/spelers/kees-weijers.jpg"
+  },
+  {
+    "id": "sep-te-lintum",
+    "naam": "Sep te Lintum",
+    "teamId": "UB",
+    "foto": "images/spelers/sep-te-lintum.jpg"
+  },
+  {
+    "id": "tygo-egberts",
+    "naam": "Tygo Egberts",
+    "teamId": "UB",
+    "foto": "images/spelers/tygo-egberts.jpg"
+  },
+  {
+    "id": "sevki-nohut",
+    "naam": "Sevki Nohut",
+    "teamId": "UB",
+    "foto": "images/spelers/sevki-nohut.jpg"
+  },
+  {
+    "id": "dylan-rutjes",
+    "naam": "Dylan Rutjes",
+    "teamId": "UB",
+    "foto": "images/spelers/dylan-rutjes.jpg"
   }
 ]
