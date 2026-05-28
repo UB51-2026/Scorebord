@@ -1,14 +1,116 @@
 [
   {
-    "id": "Jesse",
-    "naam": "Jesse Reintjes",
+    "id": "jelle-kniest",
+    "naam": "Jelle Kniest",
     "teamId": "UB",
-    "foto": "images/spelers/jesse-reintjes.png"
+    "foto": "images/spelers/jelle-kniest.jpg"
   },
   {
-    "id": "Marijn",
-    "naam": "Marijn vd H",
+    "id": "stijn-tiecken",
+    "naam": "Stijn Tiecken",
     "teamId": "UB",
-    "foto": "images/spelers/piet-de-vries.png"
+    "foto": "images/spelers/stijn-tiecken.jpg"
+  },
+  {
+    "id": "jochem-robben",
+    "naam": "Jochem Robben",
+    "teamId": "UB",
+    "foto": "images/spelers/jochem-robben.jpg"
+  },
+  {
+    "id": "wouter-bluemink",
+    "naam": "Wouter Bluemink",
+    "teamId": "UB",
+    "foto": "images/spelers/wouter-bluemink.jpg"
+  },
+  {
+    "id": "pim-slutter",
+    "naam": "Pim Slutter",
+    "teamId": "UB",
+    "foto": "images/spelers/pim-slutter.jpg"
+  },
+  {
+    "id": "noah-van-hal",
+    "naam": "Noah van Hal",
+    "teamId": "UB",
+    "foto": "images/spelers/noah-van-hal.jpg"
+  },
+  {
+    "id": "twan-kraan",
+    "naam": "Twan Kraan",
+    "teamId": "UB",
+    "foto": "images/spelers/twan-kraan.jpg"
+  },
+  {
+    "id": "joep-nijenhuis",
+    "naam": "Joep Nijenhuis",
+    "teamId": "UB",
+    "foto": "images/spelers/joep-nijenhuis.jpg"
+  },
+  {
+    "id": "max-te-lintum",
+    "naam": "Max te Lintum",
+    "teamId": "UB",
+    "foto": "images/spelers/max-te-lintum.jpg"
+  },
+  {
+    "id": "joris-beumer",
+    "naam": "Joris Beumer",
+    "teamId": "UB",
+    "foto": "images/spelers/joris-beumer.jpg"
+  },
+  {
+    "id": "cas-heuvels",
+    "naam": "Cas Heuvels",
+    "teamId": "UB",
+    "foto": "images/spelers/cas-heuvels.jpg"
+  },
+  {
+    "id": "devin-zweekhorst",
+    "naam": "Devin Zweekhorst",
+    "teamId": "UB",
+    "foto": "images/spelers/devin-zweekhorst.jpg"
+  },
+  {
+    "id": "mats-hegman",
+    "naam": "Mats Hegman",
+    "teamId": "UB",
+    "foto": "images/spelers/mats-hegman.jpg"
+  },
+  {
+    "id": "roel-gebbinck",
+    "naam": "Roel Gebbinck",
+    "teamId": "UB",
+    "foto": "images/spelers/roel-gebbinck.jpg"
+  },
+  {
+    "id": "dirk-slutter",
+    "naam": "Dirk Slutter",
+    "teamId": "UB",
+    "foto": "images/spelers/dirk-slutter.jpg"
+  },
+  {
+    "id": "ties-smeitink",
+    "naam": "Ties Smeitink",
+    "teamId": "UB",
+    "foto": "images/spelers/ties-smeitink.jpg"
+  },
+  {
+    "id": "luuk-aalders",
+    "naam": "Luuk Aalders",
+    "teamId": "UB",
+    "foto": "images/spelers/luuk-aalders.jpg"
+  },
+  {
+    "id": "jarl-erinkveld",
+    "naam": "Jarl Erinkveld",
+    "teamId": "UB",
+    "foto": "images/spelers/jarl-erinkveld.jpg"
+  },
+  {
+    "id": "kees-weijers",
+    "naam": "Kees Weijers",
+    "teamId": "UB",
+    "foto": "images/spelers/kees-weijers.jpg"
   }
 ]
