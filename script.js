@@ -355,6 +355,11 @@ function updateClock() {
     year: "numeric"
   };
 
-  currentDateElement.textContent = now.toLocaleDateString("nl-NL", dateOptions);
+  let dateString = now.toLocaleDateString("nl-NL", dateOptions);
+
+  dateString =
+    dateString.charAt(0).toUpperCase() + dateString.slice(1);
+
+  currentDateElement.textContent = dateString;
   currentClockElement.textContent = now.toLocaleTimeString("nl-NL");
 }
