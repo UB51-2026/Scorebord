@@ -36,23 +36,66 @@ async function loadData() {
 function fillTeamDropdowns() {
   const teamA = document.getElementById("teamA");
   const teamB = document.getElementById("teamB");
+  const matchType = document.getElementById("matchType");
 
   teamA.innerHTML = "";
   teamB.innerHTML = "";
 
-  teams.forEach(team => {
+  const selectedType = matchType ? matchType.value : "voorbereiding";
+
+  const filteredTeams = teams.filter(team =>
+    team.types && team.types.includes(selectedType)
+  );
+
+  filteredTeams.forEach(team => {
     teamA.add(new Option(team.naam, team.id));
     teamB.add(new Option(team.naam, team.id));
   });
 
-  const ownIndex = teams.findIndex(t => t.id === ownClubId);
-  if (ownIndex >= 0) teamA.selectedIndex = ownIndex;
+  const ownIndex = filteredTeams.findIndex(t => t.id === ownClubId);
+  if (ownIndex >= 0) {
+    teamA.selectedIndex = ownIndex;
+  }
 
-  const firstOpponentIndex = teams.findIndex(t => t.id !== ownClubId);
-  if (firstOpponentIndex >= 0) teamB.selectedIndex = firstOpponentIndex;
+  const firstOpponentIndex = filteredTeams.findIndex(t => t.id !== ownClubId);
+  if (firstOpponentIndex >= 0) {
+    teamB.selectedIndex = firstOpponentIndex;
+  }
 
-  teamA.addEventListener("change", updateTeamNames);
-  teamB.addEventListener("change", updateTeamNames);
+  preventSameTeams("teamA");
+  updateTeamNames();
+
+  if (matchType) {
+    matchType.onchange = fillTeamDropdowns;
+  }
+
+  teamA.onchange = () => {
+    preventSameTeams("teamA");
+    updateTeamNames();
+  };
+
+  teamB.onchange = () => {
+    preventSameTeams("teamB");
+    updateTeamNames();
+  };
+}
+
+function preventSameTeams(changedSelectId) {
+  const teamA = document.getElementById("teamA");
+  const teamB = document.getElementById("teamB");
+
+  if (!teamA || !teamB) return;
+  if (teamA.value !== teamB.value) return;
+
+  const changedSelect = document.getElementById(changedSelectId);
+  const otherSelect = changedSelectId === "teamA" ? teamB : teamA;
+
+  for (let i = 0; i < otherSelect.options.length; i++) {
+    if (otherSelect.options[i].value !== changedSelect.value) {
+      otherSelect.selectedIndex = i;
+      break;
+    }
+  }
 }
 
 function updateTeamNames() {
@@ -155,7 +198,7 @@ function goalTeamA() {
 
     createMessage(`⚽ DOELPUNT!
 
-${minute}' - ${player.naam}
+${formatMatchMinute(minute)} - ${player.naam}
 
 ${getTeamName("teamA")} - ${getTeamName("teamB")}
 ${scoreA} - ${scoreB}`, player.foto);
@@ -167,7 +210,7 @@ ${scoreA} - ${scoreB}`, player.foto);
 
   createMessage(`⚽ DOELPUNT!
 
-${minute}'
+${formatMatchMinute(minute)}
 
 ${getTeamName("teamA")} - ${getTeamName("teamB")}
 ${scoreA} - ${scoreB}`);
@@ -189,7 +232,7 @@ function goalTeamB() {
 
     createMessage(`⚽ DOELPUNT!
 
-${minute}' - ${player.naam}
+${formatMatchMinute(minute)} - ${player.naam}
 
 ${getTeamName("teamA")} - ${getTeamName("teamB")}
 ${scoreA} - ${scoreB}`, player.foto);
@@ -201,7 +244,7 @@ ${scoreA} - ${scoreB}`, player.foto);
 
   createMessage(`⚽ DOELPUNT TEGENSTANDER
 
-${minute}'
+${formatMatchMinute(minute)}
 
 ${getTeamName("teamA")} - ${getTeamName("teamB")}
 ${scoreA} - ${scoreB}`);
@@ -225,7 +268,7 @@ function substitution() {
 
   createMessage(`🔁 WISSEL
 
-${minute}'
+${formatMatchMinute(minute)}
 
 Eruit: ${outPlayer.naam}
 Erin: ${inPlayer.naam}
@@ -266,11 +309,11 @@ function setStatus(text) {
 
 function startTimerDisplay() {
   setInterval(() => {
-    document.getElementById("minute").textContent = `${getCurrentMinute()}'`;
+    document.getElementById("minute").textContent = `${formatMatchMinute(getCurrentMinute())}`;
   }, 1000);
 }
 
-function getCurrentMinute() {
+function getCurrentRawMinute() {
   if (matchStatus === "not_started") return 0;
   if (matchStatus === "ended" || matchStatus === "half_time") return pausedMinute;
 
@@ -285,6 +328,26 @@ function getCurrentMinute() {
   }
 
   return 0;
+}
+
+function getCurrentMinute() {
+  return getCurrentRawMinute();
+}
+
+function formatMatchMinute(minute) {
+  if (minute === 0) {
+    return "0'";
+  }
+
+  if (matchStatus === "first_half" && minute > 45) {
+    return `45+${minute - 45}'`;
+  }
+
+  if (matchStatus === "second_half" && minute > 90) {
+    return `90+${minute - 90}'`;
+  }
+
+  return `${minute}'`;
 }
 
 function createMessage(text, photoPath = null) {
@@ -356,9 +419,7 @@ function updateClock() {
   };
 
   let dateString = now.toLocaleDateString("nl-NL", dateOptions);
-
-  dateString =
-    dateString.charAt(0).toUpperCase() + dateString.slice(1);
+  dateString = dateString.charAt(0).toUpperCase() + dateString.slice(1);
 
   currentDateElement.textContent = dateString;
   currentClockElement.textContent = now.toLocaleTimeString("nl-NL");

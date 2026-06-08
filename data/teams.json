@@ -1,10 +1,22 @@
 [
   {
     "id": "UB",
-    "naam": "Ulftse Boys 1"
+    "naam": "Ulftse Boys",
+    "types": ["voorbereiding", "beker", "competitie"]
   },
   {
-    "id": "SDOUC",
-    "naam": "SDOUC 1"
+    "id": "RIJNLAND",
+    "naam": "Rijnland",
+    "types": ["voorbereiding"]
+  },
+  {
+    "id": "DOESBURG",
+    "naam": "Doesburg",
+    "types": ["voorbereiding"]
+  },
+  {
+    "id": "VIOD",
+    "naam": "VIOD",
+    "types": ["voorbereiding"]
   }
 ]
