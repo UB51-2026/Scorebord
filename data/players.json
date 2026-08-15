@@ -9,37 +9,37 @@
     "id": "stijn-tiecken",
     "naam": "Stijn Tiecken",
     "teamId": "UB",
-    "foto": "images/spelers/stijn-tiecken.png"
+    "foto": "images/spelers/stijn-tiecken.PNG"
   },
   {
     "id": "jochem-robben",
     "naam": "Jochem Robben",
     "teamId": "UB",
-    "foto": "images/spelers/jochem-robben.png"
+    "foto": "images/spelers/jochem-robben.PNG"
   },
   {
     "id": "wouter-bluemink",
     "naam": "Wouter Bluemink",
     "teamId": "UB",
-    "foto": "images/spelers/wouter-bluemink.png"
+    "foto": "images/spelers/wouter-bluemink.PNG"
   },
   {
     "id": "pim-slutter",
     "naam": "Pim Slutter",
     "teamId": "UB",
-    "foto": "images/spelers/pim-slutter.png"
+    "foto": "images/spelers/pim-slutter.PNG"
   },
   {
     "id": "noah-van-hal",
     "naam": "Noah van Hal",
     "teamId": "UB",
-    "foto": "images/spelers/noah-van-hal.png"
+    "foto": "images/spelers/noah-van-hal.PNG"
   },
   {
     "id": "twan-kraan",
     "naam": "Twan Kraan",
     "teamId": "UB",
-    "foto": "images/spelers/twan-kraan.png"
+    "foto": "images/spelers/twan-kraan.PNG"
   },
   {
     "id": "joep-nijenhuis",
@@ -51,19 +51,19 @@
     "id": "max-te-lintum",
     "naam": "Max te Lintum",
     "teamId": "UB",
-    "foto": "images/spelers/max-te-lintum.png"
+    "foto": "images/spelers/max-te-lintum.PNG"
   },
   {
     "id": "joris-beumer",
     "naam": "Joris Beumer",
     "teamId": "UB",
-    "foto": "images/spelers/joris-beumer.png"
+    "foto": "images/spelers/joris-beumer.PNG"
   },
   {
     "id": "cas-heuvels",
     "naam": "Cas Heuvels",
     "teamId": "UB",
-    "foto": "images/spelers/cas-heuvels.png"
+    "foto": "images/spelers/cas-heuvels.PNG"
   },
   {
     "id": "devin-zweekhorst",
@@ -93,25 +93,25 @@
     "id": "ties-smeitink",
     "naam": "Ties Smeitink",
     "teamId": "UB",
-    "foto": "images/spelers/ties-smeitink.png"
+    "foto": "images/spelers/ties-smeitink.PNG"
   },
   {
     "id": "luuk-aalders",
     "naam": "Luuk Aalders",
     "teamId": "UB",
-    "foto": "images/spelers/luuk-aalders.png"
+    "foto": "images/spelers/luuk-aalders.PNG"
   },
   {
     "id": "jarl-erinkveld",
     "naam": "Jarl Erinkveld",
     "teamId": "UB",
-    "foto": "images/spelers/jarl-erinkveld.png"
+    "foto": "images/spelers/jarl-erinkveld.PNG"
   },
   {
     "id": "kees-weijers",
     "naam": "Kees Weijers",
     "teamId": "UB",
-    "foto": "images/spelers/kees-weijers.png"
+    "foto": "images/spelers/kees-weijers.PNG"
   },
   {
     "id": "sep-te-lintum",
@@ -123,7 +123,7 @@
     "id": "tygo-egberts",
     "naam": "Tygo Egberts",
     "teamId": "UB",
-    "foto": "images/spelers/tygo-egberts.png"
+    "foto": "images/spelers/tygo-egberts.PNG"
   },
   {
     "id": "sevki-nohut",
@@ -141,6 +141,6 @@
     "id": "emre-cadir",
     "naam": "Emre Cadir",
     "teamId": "UB",
-    "foto": "images/spelers/emre-cadir.png"
+    "foto": "images/spelers/emre-cadir.PNG"
   }
 ]
