@@ -136,5 +136,11 @@
     "naam": "Dylan Rutjes",
     "teamId": "UB",
     "foto": "images/spelers/dylan-rutjes.jpg"
+  },
+  {
+    "id": "emre-cadir",
+    "naam": "Emre Cadir",
+    "teamId": "UB",
+    "foto": "images/spelers/emre-cadir.jpg"
   }
 ]
