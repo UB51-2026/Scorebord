@@ -2,21 +2,144 @@
   {
     "id": "UB",
     "naam": "Ulftse Boys",
-    "types": ["voorbereiding", "beker", "competitie"]
-  },
-  {
-    "id": "RIJNLAND",
-    "naam": "Rijnland",
-    "types": ["voorbereiding"]
+    "types": [
+      "voorbereiding",
+      "beker",
+      "competitie"
+    ]
   },
   {
     "id": "DOESBURG",
     "naam": "Doesburg",
-    "types": ["voorbereiding"]
+    "types": [
+      "voorbereiding"
+    ]
   },
   {
     "id": "VIOD",
     "naam": "VIOD",
-    "types": ["voorbereiding"]
+    "types": [
+      "voorbereiding"
+    ]
+  },
+  {
+    "id": "BREDEVOORT",
+    "naam": "Bredevoort",
+    "types": [
+      "beker"
+    ]
+  },
+  {
+    "id": "ETTEN",
+    "naam": "Etten",
+    "types": [
+      "beker"
+    ]
+  },
+  {
+    "id": "AD69",
+    "naam": "AD'69",
+    "types": [
+      "beker"
+    ]
+  },
+  {
+    "id": "NNB",
+    "naam": "NNB",
+    "types": [
+      "voorbereiding"
+    ]
+  },
+  {
+    "id": "VV_RIETMOLEN",
+    "naam": "VV Rietmolen",
+    "types": [
+      "competitie"
+    ]
+  },
+  {
+    "id": "SC_RIJNLAND",
+    "naam": "SC Rijnland",
+    "types": [
+      "voorbereiding",
+      "competitie"
+    ]
+  },
+  {
+    "id": "VV_REUNIE",
+    "naam": "VV Reünie",
+    "types": [
+      "competitie"
+    ]
+  },
+  {
+    "id": "VV_RUURLO",
+    "naam": "VV Ruurlo",
+    "types": [
+      "competitie"
+    ]
+  },
+  {
+    "id": "SPORTCLUB_REKKEN",
+    "naam": "Sportclub Rekken",
+    "types": [
+      "competitie"
+    ]
+  },
+  {
+    "id": "VIOS_B",
+    "naam": "VIOS B",
+    "types": [
+      "competitie"
+    ]
+  },
+  {
+    "id": "VV_MONTFERLAND",
+    "naam": "VV Montferland",
+    "types": [
+      "competitie"
+    ]
+  },
+  {
+    "id": "SP_NEEDE",
+    "naam": "SP. Neede",
+    "types": [
+      "competitie"
+    ]
+  },
+  {
+    "id": "FC_EIBERGEN",
+    "naam": "FC Eibergen",
+    "types": [
+      "competitie"
+    ]
+  },
+  {
+    "id": "SV_KILDER",
+    "naam": "SV Kilder",
+    "types": [
+      "competitie"
+    ]
+  },
+  {
+    "id": "SPRINKHANEN",
+    "naam": "Sprinkhanen",
+    "types": [
+      "competitie"
+    ]
+  },
+  {
+    "id": "VV_ERIX",
+    "naam": "VV Erix",
+    "types": [
+      "competitie"
+    ]
+  },
+  {
+    "id": "VV_GENDRINGEN",
+    "naam": "VV Gendringen",
+    "types": [
+      "competitie"
+    ]
   }
 ]
