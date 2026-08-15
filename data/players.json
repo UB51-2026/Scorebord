@@ -3,144 +3,144 @@
     "id": "jelle-kniest",
     "naam": "Jelle Kniest",
     "teamId": "UB",
-    "foto": "images/spelers/jelle-kniest.jpg"
+    "foto": null
   },
   {
     "id": "stijn-tiecken",
     "naam": "Stijn Tiecken",
     "teamId": "UB",
-    "foto": "images/spelers/stijn-tiecken.jpg"
+    "foto": "images/spelers/stijn-tiecken.png"
   },
   {
     "id": "jochem-robben",
     "naam": "Jochem Robben",
     "teamId": "UB",
-    "foto": "images/spelers/jochem-robben.jpg"
+    "foto": "images/spelers/jochem-robben.png"
   },
   {
     "id": "wouter-bluemink",
     "naam": "Wouter Bluemink",
     "teamId": "UB",
-    "foto": "images/spelers/wouter-bluemink.jpg"
+    "foto": "images/spelers/wouter-bluemink.png"
   },
   {
     "id": "pim-slutter",
     "naam": "Pim Slutter",
     "teamId": "UB",
-    "foto": "images/spelers/pim-slutter.jpg"
+    "foto": "images/spelers/pim-slutter.png"
   },
   {
     "id": "noah-van-hal",
     "naam": "Noah van Hal",
     "teamId": "UB",
-    "foto": "images/spelers/noah-van-hal.jpg"
+    "foto": "images/spelers/noah-van-hal.png"
   },
   {
     "id": "twan-kraan",
     "naam": "Twan Kraan",
     "teamId": "UB",
-    "foto": "images/spelers/twan-kraan.jpg"
+    "foto": "images/spelers/twan-kraan.png"
   },
   {
     "id": "joep-nijenhuis",
     "naam": "Joep Nijenhuis",
     "teamId": "UB",
-    "foto": "images/spelers/joep-nijenhuis.jpg"
+    "foto": null
   },
   {
     "id": "max-te-lintum",
     "naam": "Max te Lintum",
     "teamId": "UB",
-    "foto": "images/spelers/max-te-lintum.jpg"
+    "foto": "images/spelers/max-te-lintum.png"
   },
   {
     "id": "joris-beumer",
     "naam": "Joris Beumer",
     "teamId": "UB",
-    "foto": "images/spelers/joris-beumer.jpg"
+    "foto": "images/spelers/joris-beumer.png"
   },
   {
     "id": "cas-heuvels",
     "naam": "Cas Heuvels",
     "teamId": "UB",
-    "foto": "images/spelers/cas-heuvels.jpg"
+    "foto": "images/spelers/cas-heuvels.png"
   },
   {
     "id": "devin-zweekhorst",
     "naam": "Devin Zweekhorst",
     "teamId": "UB",
-    "foto": "images/spelers/devin-zweekhorst.jpg"
+    "foto": null
   },
   {
     "id": "mats-hegman",
     "naam": "Mats Hegman",
     "teamId": "UB",
-    "foto": "images/spelers/mats-hegman.jpg"
+    "foto": null
   },
   {
     "id": "roel-gebbinck",
     "naam": "Roel Gebbinck",
     "teamId": "UB",
-    "foto": "images/spelers/roel-gebbinck.jpg"
+    "foto": null
   },
   {
     "id": "dirk-slutter",
     "naam": "Dirk Slutter",
     "teamId": "UB",
-    "foto": "images/spelers/dirk-slutter.jpg"
+    "foto": null
   },
   {
     "id": "ties-smeitink",
     "naam": "Ties Smeitink",
     "teamId": "UB",
-    "foto": "images/spelers/ties-smeitink.jpg"
+    "foto": "images/spelers/ties-smeitink.png"
   },
   {
     "id": "luuk-aalders",
     "naam": "Luuk Aalders",
     "teamId": "UB",
-    "foto": "images/spelers/luuk-aalders.jpg"
+    "foto": "images/spelers/luuk-aalders.png"
   },
   {
     "id": "jarl-erinkveld",
     "naam": "Jarl Erinkveld",
     "teamId": "UB",
-    "foto": "images/spelers/jarl-erinkveld.jpg"
+    "foto": "images/spelers/jarl-erinkveld.png"
   },
   {
     "id": "kees-weijers",
     "naam": "Kees Weijers",
     "teamId": "UB",
-    "foto": "images/spelers/kees-weijers.jpg"
+    "foto": "images/spelers/kees-weijers.png"
   },
   {
     "id": "sep-te-lintum",
     "naam": "Sep te Lintum",
     "teamId": "UB",
-    "foto": "images/spelers/sep-te-lintum.jpg"
+    "foto": null
   },
   {
     "id": "tygo-egberts",
     "naam": "Tygo Egberts",
     "teamId": "UB",
-    "foto": "images/spelers/tygo-egberts.jpg"
+    "foto": "images/spelers/tygo-egberts.png"
   },
   {
     "id": "sevki-nohut",
     "naam": "Sevki Nohut",
     "teamId": "UB",
-    "foto": "images/spelers/sevki-nohut.jpg"
+    "foto": null
   },
   {
     "id": "dylan-rutjes",
     "naam": "Dylan Rutjes",
     "teamId": "UB",
-    "foto": "images/spelers/dylan-rutjes.jpg"
+    "foto": null
   },
   {
     "id": "emre-cadir",
     "naam": "Emre Cadir",
     "teamId": "UB",
-    "foto": "images/spelers/emre-cadir.jpg"
+    "foto": "images/spelers/emre-cadir.png"
   }
 ]
