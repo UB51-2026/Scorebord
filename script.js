@@ -53,11 +53,15 @@ function fillTeamDropdowns() {
   });
 
   const ownIndex = filteredTeams.findIndex(t => t.id === ownClubId);
+
   if (ownIndex >= 0) {
     teamA.selectedIndex = ownIndex;
   }
 
-  const firstOpponentIndex = filteredTeams.findIndex(t => t.id !== ownClubId);
+  const firstOpponentIndex = filteredTeams.findIndex(
+    t => t.id !== ownClubId
+  );
+
   if (firstOpponentIndex >= 0) {
     teamB.selectedIndex = firstOpponentIndex;
   }
@@ -88,10 +92,13 @@ function preventSameTeams(changedSelectId) {
   if (teamA.value !== teamB.value) return;
 
   const changedSelect = document.getElementById(changedSelectId);
-  const otherSelect = changedSelectId === "teamA" ? teamB : teamA;
+  const otherSelect =
+    changedSelectId === "teamA" ? teamB : teamA;
 
   for (let i = 0; i < otherSelect.options.length; i++) {
-    if (otherSelect.options[i].value !== changedSelect.value) {
+    if (
+      otherSelect.options[i].value !== changedSelect.value
+    ) {
       otherSelect.selectedIndex = i;
       break;
     }
@@ -99,12 +106,18 @@ function preventSameTeams(changedSelectId) {
 }
 
 function updateTeamNames() {
-  document.getElementById("teamAName").textContent = getTeamName("teamA");
-  document.getElementById("teamBName").textContent = getTeamName("teamB");
+  document.getElementById("teamAName").textContent =
+    getTeamName("teamA");
+
+  document.getElementById("teamBName").textContent =
+    getTeamName("teamB");
 }
 
 function loadOwnClubPlayers() {
-  const ownClubPlayers = players.filter(p => p.teamId === ownClubId);
+  const ownClubPlayers = players.filter(
+    p => p.teamId === ownClubId
+  );
+
   fillPlayerSelect("playerSelect", ownClubPlayers);
   fillPlayerSelect("playerOut", ownClubPlayers);
   fillPlayerSelect("playerIn", ownClubPlayers);
@@ -112,27 +125,44 @@ function loadOwnClubPlayers() {
 
 function fillPlayerSelect(elementId, playerList) {
   const select = document.getElementById(elementId);
+
   select.innerHTML = "";
 
   playerList.forEach(player => {
-    select.add(new Option(player.naam, player.id));
+    select.add(
+      new Option(player.naam, player.id)
+    );
   });
 }
 
 function getTeamName(selectId) {
-  const teamId = document.getElementById(selectId).value;
-  const team = teams.find(t => t.id === teamId);
+  const teamId =
+    document.getElementById(selectId).value;
+
+  const team = teams.find(
+    t => t.id === teamId
+  );
+
   return team ? team.naam : "";
 }
 
 function getSelectedPlayer(selectId) {
-  const playerId = document.getElementById(selectId).value;
-  return players.find(p => p.id === playerId);
+  const playerId =
+    document.getElementById(selectId).value;
+
+  return players.find(
+    p => p.id === playerId
+  );
 }
+
+/* ========================================
+   1. WEDSTRIJD GESTART
+======================================== */
 
 function startMatch() {
   scoreA = 0;
   scoreB = 0;
+
   updateScore();
 
   firstHalfStartedAt = Date.now();
@@ -142,52 +172,87 @@ function startMatch() {
 
   setStatus("1e helft loopt");
 
-  createMessage(`⚽ WEDSTRIJD GESTART
+  createMessage(
+`⚽ De wedstrijd tussen ${getTeamName("teamA")} - ${getTeamName("teamB")} is gestart! 🔥
 
-${getTeamName("teamA")} - ${getTeamName("teamB")}
-
-We zijn begonnen!`);
+Succes Boys! 🔴⚪🔵`
+  );
 }
+
+/* ========================================
+   4. RUST
+======================================== */
 
 function halfTime() {
   pausedMinute = getCurrentMinute();
   matchStatus = "half_time";
+
   setStatus("Rust");
 
-  createMessage(`⏸ RUST
+  createMessage(
+`⏸️ Het is rust.
 
-${getTeamName("teamA")} - ${getTeamName("teamB")}
-Tussenstand: ${scoreA} - ${scoreB}`);
+Tussenstand:
+${getTeamName("teamA")} - ${getTeamName("teamB")} | ${scoreA}-${scoreB}`
+  );
 }
+
+/* ========================================
+   5. START TWEEDE HELFT
+======================================== */
 
 function startSecondHalf() {
   secondHalfStartedAt = Date.now();
   matchStatus = "second_half";
+
   setStatus("2e helft loopt");
 
-  createMessage(`▶ START 2E HELFT
+  createMessage(
+`⚽ We zijn begonnen met de tweede helft! 🔥
 
-${getTeamName("teamA")} - ${getTeamName("teamB")}
-Tussenstand: ${scoreA} - ${scoreB}`);
+Kom op Boys! 🔴⚪🔵`
+  );
 }
+
+/* ========================================
+   6. EINDE WEDSTRIJD
+======================================== */
 
 function endMatch() {
   pausedMinute = getCurrentMinute();
   matchStatus = "ended";
+
   setStatus("Afgelopen");
 
-  createMessage(`🏁 EINDE WEDSTRIJD
+  createMessage(
+`🏁 Einde wedstrijd!
 
-${getTeamName("teamA")} - ${getTeamName("teamB")}
-Eindstand: ${scoreA} - ${scoreB}`);
+De eindstand van de wedstrijd ${getTeamName("teamA")} - ${getTeamName("teamB")} is ${scoreA}-${scoreB}.
+
+Bedankt voor het volgen van de wedstrijd via ons kanaal en hopelijk tot de volgende keer!
+
+Blijf ons via het kanaal volgen voor alle actuele nieuwtjes en tussenstanden rondom ons eerste elftal. 🔴⚪🔵`
+  );
 }
 
+/* ========================================
+   GOAL THUIS
+======================================== */
+
 function goalTeamA() {
-  const teamAId = document.getElementById("teamA").value;
+  const teamAId =
+    document.getElementById("teamA").value;
+
   const minute = getCurrentMinute();
 
+  /*
+   * Ulftse Boys is thuis.
+   * Scenario 2: Goal Ulftse Boys.
+   */
   if (teamAId === ownClubId) {
-    const player = getSelectedPlayer("playerSelect");
+    const player =
+      getSelectedPlayer("playerSelect");
+
     if (!player) {
       alert("Kies eerst een speler.");
       return;
@@ -196,32 +261,50 @@ function goalTeamA() {
     scoreA++;
     updateScore();
 
-    createMessage(`⚽ DOELPUNT!
+    createMessage(
+`⚽🔥 GOOOAAALLL ULFTSE BOYS!!!
 
-${formatMatchMinute(minute)} - ${player.naam}
+${formatMatchMinute(minute)} | ${getTeamName("teamA")} - ${getTeamName("teamB")} | ${scoreA}-${scoreB}
 
-${getTeamName("teamA")} - ${getTeamName("teamB")}
-${scoreA} - ${scoreB}`, player.foto);
+⚽ ${player.naam}`,
+      player.foto
+    );
+
     return;
   }
 
+  /*
+   * Tegenstander is thuis.
+   * Scenario 7: Goal tegenstander.
+   */
   scoreA++;
   updateScore();
 
-  createMessage(`⚽ DOELPUNT!
+  createMessage(
+`⚽ Goal ${getTeamName("teamA")}
 
-${formatMatchMinute(minute)}
-
-${getTeamName("teamA")} - ${getTeamName("teamB")}
-${scoreA} - ${scoreB}`);
+${formatMatchMinute(minute)} | ${getTeamName("teamA")} - ${getTeamName("teamB")} | ${scoreA}-${scoreB}`
+  );
 }
 
+/* ========================================
+   GOAL UIT
+======================================== */
+
 function goalTeamB() {
-  const teamBId = document.getElementById("teamB").value;
+  const teamBId =
+    document.getElementById("teamB").value;
+
   const minute = getCurrentMinute();
 
+  /*
+   * Ulftse Boys is uit.
+   * Scenario 2: Goal Ulftse Boys.
+   */
   if (teamBId === ownClubId) {
-    const player = getSelectedPlayer("playerSelect");
+    const player =
+      getSelectedPlayer("playerSelect");
+
     if (!player) {
       alert("Kies eerst een speler.");
       return;
@@ -230,101 +313,180 @@ function goalTeamB() {
     scoreB++;
     updateScore();
 
-    createMessage(`⚽ DOELPUNT!
+    createMessage(
+`⚽🔥 GOOOAAALLL ULFTSE BOYS!!!
 
-${formatMatchMinute(minute)} - ${player.naam}
+${formatMatchMinute(minute)} | ${getTeamName("teamA")} - ${getTeamName("teamB")} | ${scoreA}-${scoreB}
 
-${getTeamName("teamA")} - ${getTeamName("teamB")}
-${scoreA} - ${scoreB}`, player.foto);
+⚽ ${player.naam}`,
+      player.foto
+    );
+
     return;
   }
 
+  /*
+   * Tegenstander is uit.
+   * Scenario 7: Goal tegenstander.
+   */
   scoreB++;
   updateScore();
 
-  createMessage(`⚽ DOELPUNT TEGENSTANDER
+  createMessage(
+`⚽ Goal ${getTeamName("teamB")}
 
-${formatMatchMinute(minute)}
-
-${getTeamName("teamA")} - ${getTeamName("teamB")}
-${scoreA} - ${scoreB}`);
+${formatMatchMinute(minute)} | ${getTeamName("teamA")} - ${getTeamName("teamB")} | ${scoreA}-${scoreB}`
+  );
 }
 
+/* ========================================
+   3. WISSEL ULFTSE BOYS
+======================================== */
+
 function substitution() {
-  const outPlayer = getSelectedPlayer("playerOut");
-  const inPlayer = getSelectedPlayer("playerIn");
+  const outPlayer =
+    getSelectedPlayer("playerOut");
+
+  const inPlayer =
+    getSelectedPlayer("playerIn");
 
   if (!outPlayer || !inPlayer) {
-    alert("Kies speler eruit en speler erin.");
+    alert(
+      "Kies speler eruit en speler erin."
+    );
     return;
   }
 
   if (outPlayer.id === inPlayer.id) {
-    alert("Speler eruit en erin mogen niet dezelfde speler zijn.");
+    alert(
+      "Speler eruit en erin mogen niet dezelfde speler zijn."
+    );
     return;
   }
 
   const minute = getCurrentMinute();
 
-  createMessage(`🔁 WISSEL
+  createMessage(
+`🔄 ${formatMatchMinute(minute)} | Wissel Ulftse Boys
 
-${formatMatchMinute(minute)}
-
-Eruit: ${outPlayer.naam}
-Erin: ${inPlayer.naam}
-
-${getTeamName("teamA")} - ${getTeamName("teamB")}
-${scoreA} - ${scoreB}`);
+Erin: ${inPlayer.naam} ➡️
+Eruit: ${outPlayer.naam} ⬅️`
+  );
 }
 
+/* ========================================
+   RESET WEDSTRIJD
+======================================== */
+
 function resetMatch() {
-  if (!confirm("Weet je zeker dat je de wedstrijd wilt resetten?")) return;
+  if (
+    !confirm(
+      "Weet je zeker dat je de wedstrijd wilt resetten?"
+    )
+  ) {
+    return;
+  }
 
   scoreA = 0;
   scoreB = 0;
+
   matchStatus = "not_started";
+
   firstHalfStartedAt = null;
   secondHalfStartedAt = null;
+
   pausedMinute = 0;
+
   currentMessage = "";
   currentPhotoPath = null;
 
   updateScore();
+
   setStatus("Nog niet gestart");
 
-  document.getElementById("minute").textContent = "0'";
-  document.getElementById("messagePreview").textContent = "Nog geen bericht.";
-  document.getElementById("photoPreview").src = "";
-  document.getElementById("photoPreviewWrap").classList.add("hidden");
+  document.getElementById(
+    "minute"
+  ).textContent = "0'";
+
+  document.getElementById(
+    "messagePreview"
+  ).textContent = "Nog geen bericht.";
+
+  document.getElementById(
+    "photoPreview"
+  ).src = "";
+
+  document.getElementById(
+    "photoPreviewWrap"
+  ).classList.add("hidden");
 }
 
+/* ========================================
+   SCORE
+======================================== */
+
 function updateScore() {
-  document.getElementById("scoreA").textContent = scoreA;
-  document.getElementById("scoreB").textContent = scoreB;
+  document.getElementById(
+    "scoreA"
+  ).textContent = scoreA;
+
+  document.getElementById(
+    "scoreB"
+  ).textContent = scoreB;
 }
 
 function setStatus(text) {
-  document.getElementById("status").textContent = text;
+  document.getElementById(
+    "status"
+  ).textContent = text;
 }
+
+/* ========================================
+   WEDSTRIJDKLOK
+======================================== */
 
 function startTimerDisplay() {
   setInterval(() => {
-    document.getElementById("minute").textContent = `${formatMatchMinute(getCurrentMinute())}`;
+    document.getElementById(
+      "minute"
+    ).textContent =
+      `${formatMatchMinute(getCurrentMinute())}`;
   }, 1000);
 }
 
 function getCurrentRawMinute() {
-  if (matchStatus === "not_started") return 0;
-  if (matchStatus === "ended" || matchStatus === "half_time") return pausedMinute;
+  if (matchStatus === "not_started") {
+    return 0;
+  }
+
+  if (
+    matchStatus === "ended" ||
+    matchStatus === "half_time"
+  ) {
+    return pausedMinute;
+  }
 
   if (matchStatus === "first_half") {
-    const diff = Date.now() - firstHalfStartedAt;
-    return Math.max(1, Math.ceil(diff / 60000));
+    const diff =
+      Date.now() - firstHalfStartedAt;
+
+    return Math.max(
+      1,
+      Math.ceil(diff / 60000)
+    );
   }
 
   if (matchStatus === "second_half") {
-    const diff = Date.now() - secondHalfStartedAt;
-    return 45 + Math.max(1, Math.ceil(diff / 60000));
+    const diff =
+      Date.now() - secondHalfStartedAt;
+
+    return (
+      45 +
+      Math.max(
+        1,
+        Math.ceil(diff / 60000)
+      )
+    );
   }
 
   return 0;
@@ -339,34 +501,66 @@ function formatMatchMinute(minute) {
     return "0'";
   }
 
-  if (matchStatus === "first_half" && minute > 45) {
+  if (
+    matchStatus === "first_half" &&
+    minute > 45
+  ) {
     return `45+${minute - 45}'`;
   }
 
-  if (matchStatus === "second_half" && minute > 90) {
+  if (
+    matchStatus === "second_half" &&
+    minute > 90
+  ) {
     return `90+${minute - 90}'`;
   }
 
   return `${minute}'`;
 }
 
-function createMessage(text, photoPath = null) {
+/* ========================================
+   BERICHT + SPELERSFOTO
+======================================== */
+
+function createMessage(
+  text,
+  photoPath = null
+) {
   currentMessage = text;
   currentPhotoPath = photoPath;
 
-  document.getElementById("messagePreview").textContent = text;
+  document.getElementById(
+    "messagePreview"
+  ).textContent = text;
 
-  const wrap = document.getElementById("photoPreviewWrap");
-  const img = document.getElementById("photoPreview");
+  const wrap =
+    document.getElementById(
+      "photoPreviewWrap"
+    );
+
+  const img =
+    document.getElementById(
+      "photoPreview"
+    );
 
   if (photoPath) {
     img.src = photoPath;
-    wrap.classList.remove("hidden");
+
+    wrap.classList.remove(
+      "hidden"
+    );
   } else {
     img.src = "";
-    wrap.classList.add("hidden");
+
+    wrap.classList.add(
+      "hidden"
+    );
   }
 }
+
+/* ========================================
+   DELEN VIA WHATSAPP
+======================================== */
 
 async function shareWhatsApp() {
   if (!currentMessage) {
@@ -375,37 +569,101 @@ async function shareWhatsApp() {
   }
 
   try {
+    /*
+     * Indien er een spelersfoto is,
+     * proberen we tekst + foto samen
+     * via de sharefunctie te delen.
+     */
     if (currentPhotoPath) {
-      const response = await fetch(currentPhotoPath);
-      const blob = await response.blob();
-      const filename = currentPhotoPath.split("/").pop();
-      const file = new File([blob], filename, { type: blob.type });
+      const response =
+        await fetch(currentPhotoPath);
 
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ text: currentMessage, files: [file] });
+      const blob =
+        await response.blob();
+
+      const filename =
+        currentPhotoPath
+          .split("/")
+          .pop();
+
+      const file =
+        new File(
+          [blob],
+          filename,
+          { type: blob.type }
+        );
+
+      if (
+        navigator.canShare &&
+        navigator.canShare({
+          files: [file]
+        })
+      ) {
+        await navigator.share({
+          text: currentMessage,
+          files: [file]
+        });
+
         return;
       }
     }
 
+    /*
+     * Geen foto of apparaat ondersteunt
+     * delen van bestanden niet.
+     */
     if (navigator.share) {
-      await navigator.share({ text: currentMessage });
+      await navigator.share({
+        text: currentMessage
+      });
+
       return;
     }
 
-    await navigator.clipboard.writeText(currentMessage);
-    alert("Bericht gekopieerd. Open WhatsApp en plak het bericht handmatig.");
+    /*
+     * Laatste fallback:
+     * bericht naar klembord.
+     */
+    await navigator.clipboard.writeText(
+      currentMessage
+    );
+
+    alert(
+      "Bericht gekopieerd. Open WhatsApp en plak het bericht handmatig."
+    );
+
   } catch (error) {
     console.error(error);
-    await navigator.clipboard.writeText(currentMessage);
-    alert("Delen lukte niet. Het bericht is gekopieerd.");
+
+    await navigator.clipboard.writeText(
+      currentMessage
+    );
+
+    alert(
+      "Delen lukte niet. Het bericht is gekopieerd."
+    );
   }
 }
 
-function updateClock() {
-  const currentDateElement = document.getElementById("currentDate");
-  const currentClockElement = document.getElementById("currentClock");
+/* ========================================
+   DATUM + LIVE KLOK
+======================================== */
 
-  if (!currentDateElement || !currentClockElement) {
+function updateClock() {
+  const currentDateElement =
+    document.getElementById(
+      "currentDate"
+    );
+
+  const currentClockElement =
+    document.getElementById(
+      "currentClock"
+    );
+
+  if (
+    !currentDateElement ||
+    !currentClockElement
+  ) {
     return;
   }
 
@@ -418,9 +676,21 @@ function updateClock() {
     year: "numeric"
   };
 
-  let dateString = now.toLocaleDateString("nl-NL", dateOptions);
-  dateString = dateString.charAt(0).toUpperCase() + dateString.slice(1);
+  let dateString =
+    now.toLocaleDateString(
+      "nl-NL",
+      dateOptions
+    );
 
-  currentDateElement.textContent = dateString;
-  currentClockElement.textContent = now.toLocaleTimeString("nl-NL");
+  dateString =
+    dateString
+      .charAt(0)
+      .toUpperCase() +
+    dateString.slice(1);
+
+  currentDateElement.textContent =
+    dateString;
+
+  currentClockElement.textContent =
+    now.toLocaleTimeString("nl-NL");
 }
