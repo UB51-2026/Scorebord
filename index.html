@@ -39,11 +39,13 @@
 
       <div class="scoreboard">
         <div id="teamAName">Team A</div>
+
         <div class="score">
           <span id="scoreA">0</span>
           <span>-</span>
           <span id="scoreB">0</span>
         </div>
+
         <div id="teamBName">Team B</div>
       </div>
 
@@ -55,6 +57,7 @@
 
     <section class="card">
       <h2>Wedstrijd</h2>
+
       <div class="buttons">
         <button onclick="startMatch()">▶ Start wedstrijd</button>
         <button onclick="halfTime()">⏸ Rust</button>
@@ -74,7 +77,12 @@
 
       <div class="buttons">
         <button class="goal" onclick="goalTeamA()">⚽ Goal thuis</button>
+
         <button class="danger" onclick="goalTeamB()">⚽ Goal uit</button>
+
+        <button onclick="openUndoGoalDialog()">
+          ↩ Laatste goal ongedaan maken
+        </button>
       </div>
 
       <div class="grid">
@@ -89,19 +97,48 @@
         </label>
       </div>
 
-      <button onclick="substitution()">🔁 Wissel Ulftse Boys</button>
+      <button onclick="substitution()">
+        🔁 Wissel Ulftse Boys
+      </button>
     </section>
 
     <section class="card">
       <h2>Bericht preview</h2>
+
       <pre id="messagePreview">Nog geen bericht.</pre>
 
       <div id="photoPreviewWrap" class="photo-wrap hidden">
         <img id="photoPreview" alt="Spelerfoto preview" />
       </div>
 
-      <button class="share" onclick="shareWhatsApp()">📤 Deel via WhatsApp</button>
+      <button class="share" onclick="shareWhatsApp()">
+        📤 Deel via WhatsApp
+      </button>
     </section>
+
+    <dialog id="undoGoalDialog">
+      <h3>Laatste goal ongedaan maken</h3>
+
+      <p>Waarom wil je de goal terugdraaien?</p>
+
+      <div class="buttons">
+        <button
+          class="danger"
+          onclick="undoLastGoal('disallowed')"
+        >
+          ❌ Afgekeurd
+        </button>
+
+        <button onclick="undoLastGoal('mistake')">
+          ↩ Verkeerde invoer
+        </button>
+
+        <button onclick="closeUndoGoalDialog()">
+          Annuleren
+        </button>
+      </div>
+    </dialog>
+
   </main>
 
   <script src="script.js"></script>

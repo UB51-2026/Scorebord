@@ -14,6 +14,9 @@ let pausedMinute = 0;
 let currentMessage = "";
 let currentPhotoPath = null;
 
+// Onthoudt de laatste goal zodat deze kan worden teruggedraaid
+let lastGoal = null;
+
 document.addEventListener("DOMContentLoaded", async () => {
   await loadData();
   fillTeamDropdowns();
@@ -96,9 +99,7 @@ function preventSameTeams(changedSelectId) {
     changedSelectId === "teamA" ? teamB : teamA;
 
   for (let i = 0; i < otherSelect.options.length; i++) {
-    if (
-      otherSelect.options[i].value !== changedSelect.value
-    ) {
+    if (otherSelect.options[i].value !== changedSelect.value) {
       otherSelect.selectedIndex = i;
       break;
     }
@@ -162,6 +163,7 @@ function getSelectedPlayer(selectId) {
 function startMatch() {
   scoreA = 0;
   scoreB = 0;
+  lastGoal = null;
 
   updateScore();
 
@@ -245,15 +247,21 @@ function goalTeamA() {
 
   const minute = getCurrentMinute();
 
+  // Bewaar de stand VOOR de goal
+  lastGoal = {
+    previousScoreA: scoreA,
+    previousScoreB: scoreB
+  };
+
   /*
-   * Ulftse Boys is thuis.
-   * Scenario 2: Goal Ulftse Boys.
+   * Ulftse Boys is thuis
    */
   if (teamAId === ownClubId) {
     const player =
       getSelectedPlayer("playerSelect");
 
     if (!player) {
+      lastGoal = null;
       alert("Kies eerst een speler.");
       return;
     }
@@ -274,8 +282,7 @@ ${formatMatchMinute(minute)} | ${getTeamName("teamA")} - ${getTeamName("teamB")}
   }
 
   /*
-   * Tegenstander is thuis.
-   * Scenario 7: Goal tegenstander.
+   * Tegenstander is thuis
    */
   scoreA++;
   updateScore();
@@ -297,15 +304,21 @@ function goalTeamB() {
 
   const minute = getCurrentMinute();
 
+  // Bewaar de stand VOOR de goal
+  lastGoal = {
+    previousScoreA: scoreA,
+    previousScoreB: scoreB
+  };
+
   /*
-   * Ulftse Boys is uit.
-   * Scenario 2: Goal Ulftse Boys.
+   * Ulftse Boys is uit
    */
   if (teamBId === ownClubId) {
     const player =
       getSelectedPlayer("playerSelect");
 
     if (!player) {
+      lastGoal = null;
       alert("Kies eerst een speler.");
       return;
     }
@@ -326,8 +339,7 @@ ${formatMatchMinute(minute)} | ${getTeamName("teamA")} - ${getTeamName("teamB")}
   }
 
   /*
-   * Tegenstander is uit.
-   * Scenario 7: Goal tegenstander.
+   * Tegenstander is uit
    */
   scoreB++;
   updateScore();
@@ -337,6 +349,83 @@ ${formatMatchMinute(minute)} | ${getTeamName("teamA")} - ${getTeamName("teamB")}
 
 ${formatMatchMinute(minute)} | ${getTeamName("teamA")} - ${getTeamName("teamB")} | ${scoreA}-${scoreB}`
   );
+}
+
+/* ========================================
+   LAATSTE GOAL ONGEDAAN MAKEN
+======================================== */
+
+function openUndoGoalDialog() {
+  if (!lastGoal) {
+    alert("Er is geen doelpunt om terug te draaien.");
+    return;
+  }
+
+  document
+    .getElementById("undoGoalDialog")
+    .showModal();
+}
+
+function closeUndoGoalDialog() {
+  document
+    .getElementById("undoGoalDialog")
+    .close();
+}
+
+function undoLastGoal(reason) {
+  if (!lastGoal) {
+    closeUndoGoalDialog();
+    return;
+  }
+
+  // Herstel de stand van vóór de laatste goal
+  scoreA = lastGoal.previousScoreA;
+  scoreB = lastGoal.previousScoreB;
+
+  updateScore();
+
+  // Dezelfde goal kan niet nogmaals worden teruggedraaid
+  lastGoal = null;
+
+  closeUndoGoalDialog();
+
+  /*
+   * AFGEKEURD
+   * Hiervoor maken we WEL een WhatsApp-bericht.
+   */
+  if (reason === "disallowed") {
+    createMessage(
+`❌ Doelpunt afgekeurd
+
+Nieuwe tussenstand:
+${getTeamName("teamA")} - ${getTeamName("teamB")} | ${scoreA}-${scoreB}`
+    );
+
+    return;
+  }
+
+  /*
+   * VERKEERDE INVOER
+   * Alleen score corrigeren.
+   * Niets klaarzetten voor WhatsApp.
+   */
+  if (reason === "mistake") {
+    currentMessage = "";
+    currentPhotoPath = null;
+
+    document.getElementById(
+      "messagePreview"
+    ).textContent =
+      "Laatste goal verwijderd wegens verkeerde invoer.";
+
+    document.getElementById(
+      "photoPreview"
+    ).src = "";
+
+    document.getElementById(
+      "photoPreviewWrap"
+    ).classList.add("hidden");
+  }
 }
 
 /* ========================================
@@ -399,6 +488,7 @@ function resetMatch() {
 
   currentMessage = "";
   currentPhotoPath = null;
+  lastGoal = null;
 
   updateScore();
 
@@ -569,11 +659,6 @@ async function shareWhatsApp() {
   }
 
   try {
-    /*
-     * Indien er een spelersfoto is,
-     * proberen we tekst + foto samen
-     * via de sharefunctie te delen.
-     */
     if (currentPhotoPath) {
       const response =
         await fetch(currentPhotoPath);
@@ -608,10 +693,6 @@ async function shareWhatsApp() {
       }
     }
 
-    /*
-     * Geen foto of apparaat ondersteunt
-     * delen van bestanden niet.
-     */
     if (navigator.share) {
       await navigator.share({
         text: currentMessage
@@ -620,10 +701,6 @@ async function shareWhatsApp() {
       return;
     }
 
-    /*
-     * Laatste fallback:
-     * bericht naar klembord.
-     */
     await navigator.clipboard.writeText(
       currentMessage
     );
