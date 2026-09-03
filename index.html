@@ -8,6 +8,7 @@
 </head>
 <body>
   <main class="app">
+
     <section class="card">
       <h1>⚽ Ulftse Boys Live</h1>
 
@@ -55,17 +56,36 @@
       </div>
     </section>
 
+
     <section class="card">
       <h2>Wedstrijd</h2>
 
       <div class="buttons">
-        <button onclick="startMatch()">▶ Start wedstrijd</button>
-        <button onclick="halfTime()">⏸ Rust</button>
-        <button onclick="startSecondHalf()">▶ Start 2e helft</button>
-        <button onclick="endMatch()">🏁 Einde wedstrijd</button>
-        <button class="danger" onclick="resetMatch()">🔄 Reset wedstrijd</button>
+        <button onclick="startMatch()">
+          ▶ Start wedstrijd
+        </button>
+
+        <button onclick="halfTime()">
+          ⏸ Rust
+        </button>
+
+        <button onclick="startSecondHalf()">
+          ▶ Start 2e helft
+        </button>
+
+        <button onclick="endMatch()">
+          🏁 Einde wedstrijd
+        </button>
+
+        <button
+          class="danger"
+          onclick="resetMatch()"
+        >
+          🔄 Reset wedstrijd
+        </button>
       </div>
     </section>
+
 
     <section class="card">
       <h2>Acties</h2>
@@ -76,9 +96,23 @@
       </label>
 
       <div class="buttons">
-        <button class="goal" onclick="goalTeamA()">⚽ Goal thuis</button>
+        <button
+          class="goal"
+          onclick="goalTeamA()"
+        >
+          ⚽ Goal thuis
+        </button>
 
-        <button class="danger" onclick="goalTeamB()">⚽ Goal uit</button>
+        <button
+          class="danger"
+          onclick="goalTeamB()"
+        >
+          ⚽ Goal uit
+        </button>
+
+        <button onclick="openAssignGoalDialog()">
+          👤 Doelpuntenmaker toekennen
+        </button>
 
         <button onclick="openUndoGoalDialog()">
           ↩ Laatste goal ongedaan maken
@@ -102,24 +136,77 @@
       </button>
     </section>
 
+
     <section class="card">
       <h2>Bericht preview</h2>
 
       <pre id="messagePreview">Nog geen bericht.</pre>
 
-      <div id="photoPreviewWrap" class="photo-wrap hidden">
-        <img id="photoPreview" alt="Spelerfoto preview" />
+      <div
+        id="photoPreviewWrap"
+        class="photo-wrap hidden"
+      >
+        <img
+          id="photoPreview"
+          alt="Spelerfoto preview"
+        />
       </div>
 
-      <button class="share" onclick="shareWhatsApp()">
+      <button
+        class="share"
+        onclick="shareWhatsApp()"
+      >
         📤 Deel via WhatsApp
       </button>
     </section>
 
+
+    <!-- DOELPUNTENMAKER LATER TOEWIJZEN -->
+
+    <dialog id="assignGoalDialog">
+      <h3>Doelpuntenmaker toekennen</h3>
+
+      <p>
+        Kies eerst het doelpunt en daarna de speler.
+      </p>
+
+      <label>
+        Doelpunt:
+        <select id="unknownGoalSelect"></select>
+      </label>
+
+      <br /><br />
+
+      <label>
+        Doelpuntenmaker:
+        <select id="assignPlayerSelect"></select>
+      </label>
+
+      <br /><br />
+
+      <div class="buttons">
+        <button
+          class="goal"
+          onclick="assignGoalScorer()"
+        >
+          ✓ Toekennen
+        </button>
+
+        <button onclick="closeAssignGoalDialog()">
+          Annuleren
+        </button>
+      </div>
+    </dialog>
+
+
+    <!-- LAATSTE GOAL ONGEDAAN MAKEN -->
+
     <dialog id="undoGoalDialog">
       <h3>Laatste goal ongedaan maken</h3>
 
-      <p>Waarom wil je de goal terugdraaien?</p>
+      <p>
+        Waarom wil je de goal terugdraaien?
+      </p>
 
       <div class="buttons">
         <button
