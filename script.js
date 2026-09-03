@@ -17,8 +17,7 @@ let currentPhotoPath = null;
 // Onthoudt de laatste goal zodat deze kan worden teruggedraaid
 let lastGoal = null;
 
-// Hierin bewaren we alle goals van Ulftse Boys.
-// Ook goals waarvan de doelpuntenmaker nog onbekend is.
+// Hierin bewaren we alle goals van Ulftse Boys
 let ownGoals = [];
 
 // Uniek nummer voor iedere Ulftse Boys-goal
@@ -32,6 +31,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   updateTeamNames();
   loadOwnClubPlayers();
   startTimerDisplay();
+
+  updateUnknownGoalReminder();
 
   updateClock();
   setInterval(updateClock, 1000);
@@ -223,19 +224,11 @@ function loadOwnClubPlayers() {
       p => p.teamId === ownClubId
     );
 
-  /*
-   * Bij "Gescoord door" komt standaard
-   * ONBEKEND bovenaan te staan.
-   */
   fillGoalScorerSelect(
     "playerSelect",
     ownClubPlayers
   );
 
-  /*
-   * Wissels blijven gewoon alleen
-   * echte spelers tonen.
-   */
   fillPlayerSelect(
     "playerOut",
     ownClubPlayers
@@ -246,11 +239,6 @@ function loadOwnClubPlayers() {
     ownClubPlayers
   );
 
-  /*
-   * Deze lijst gebruiken we wanneer
-   * later een onbekende goal wordt
-   * toegewezen.
-   */
   fillPlayerSelect(
     "assignPlayerSelect",
     ownClubPlayers
@@ -259,9 +247,8 @@ function loadOwnClubPlayers() {
 
 
 /*
- * Speciale spelerslijst voor goals.
- * "Onbekend" staat altijd bovenaan
- * en is standaard geselecteerd.
+ * Bij goals staat "Onbekend"
+ * altijd bovenaan en standaard geselecteerd.
  */
 function fillGoalScorerSelect(
   elementId,
@@ -295,8 +282,7 @@ function fillGoalScorerSelect(
 
 
 /*
- * Normale spelerslijst,
- * bijvoorbeeld voor wissels.
+ * Normale spelerslijst
  */
 function fillPlayerSelect(
   elementId,
@@ -336,14 +322,6 @@ function getSelectedPlayer(selectId) {
 }
 
 
-/*
- * Na iedere Ulftse Boys-goal
- * zetten we de scorer weer terug
- * op "Onbekend".
- *
- * Zo kan nooit per ongeluk de speler
- * van de vorige goal blijven staan.
- */
 function resetGoalScorerSelect() {
   const select =
     document.getElementById(
@@ -370,6 +348,7 @@ function startMatch() {
   nextGoalId = 1;
 
   resetGoalScorerSelect();
+  updateUnknownGoalReminder();
 
   updateScore();
 
@@ -502,6 +481,8 @@ function registerOwnGoal(
 
   ownGoals.push(goal);
 
+  updateUnknownGoalReminder();
+
   return goal;
 }
 
@@ -519,9 +500,6 @@ function goalTeamA() {
   const minute =
     getCurrentMinute();
 
-  /*
-   * Bewaar de stand VOOR de goal.
-   */
   lastGoal = {
     previousScoreA: scoreA,
     previousScoreB: scoreB,
@@ -542,10 +520,6 @@ function goalTeamA() {
 
     updateScore();
 
-    /*
-     * Goal wordt ALTIJD geregistreerd.
-     * Ook als de speler onbekend is.
-     */
     const goal =
       registerOwnGoal(
         minute,
@@ -570,6 +544,7 @@ ${formatMatchMinute(minute)} | ${getTeamName("teamA")} - ${getTeamName("teamB")}
       );
     }
 
+
     /*
      * SPELER ONBEKEND
      */
@@ -581,11 +556,6 @@ ${formatMatchMinute(minute)} | ${getTeamName("teamA")} - ${getTeamName("teamB")}
       );
     }
 
-
-    /*
-     * Na de goal altijd terug
-     * naar "Onbekend".
-     */
     resetGoalScorerSelect();
 
     return;
@@ -620,9 +590,6 @@ function goalTeamB() {
   const minute =
     getCurrentMinute();
 
-  /*
-   * Bewaar de stand VOOR de goal.
-   */
   lastGoal = {
     previousScoreA: scoreA,
     previousScoreB: scoreB,
@@ -643,10 +610,6 @@ function goalTeamB() {
 
     updateScore();
 
-    /*
-     * Goal wordt ALTIJD geregistreerd.
-     * Ook wanneer speler onbekend is.
-     */
     const goal =
       registerOwnGoal(
         minute,
@@ -671,6 +634,7 @@ ${formatMatchMinute(minute)} | ${getTeamName("teamA")} - ${getTeamName("teamB")}
       );
     }
 
+
     /*
      * SPELER ONBEKEND
      */
@@ -682,11 +646,6 @@ ${formatMatchMinute(minute)} | ${getTeamName("teamA")} - ${getTeamName("teamB")}
       );
     }
 
-
-    /*
-     * Na de goal weer standaard
-     * "Onbekend".
-     */
     resetGoalScorerSelect();
 
     return;
@@ -716,6 +675,65 @@ function getUnknownGoals() {
   return ownGoals.filter(
     goal => !goal.playerId
   );
+}
+
+
+/* ========================================
+   REMINDER ONBEKENDE GOALS
+======================================== */
+
+function updateUnknownGoalReminder() {
+  const reminder =
+    document.getElementById(
+      "unknownGoalReminder"
+    );
+
+  const reminderText =
+    document.getElementById(
+      "unknownGoalReminderText"
+    );
+
+  if (
+    !reminder ||
+    !reminderText
+  ) {
+    return;
+  }
+
+  const unknownGoals =
+    getUnknownGoals();
+
+
+  /*
+   * GEEN OPENSTAANDE GOALS
+   */
+  if (unknownGoals.length === 0) {
+    reminder.classList.add(
+      "hidden"
+    );
+
+    reminderText.textContent =
+      "";
+
+    return;
+  }
+
+
+  /*
+   * WEL OPENSTAANDE GOALS
+   */
+  reminder.classList.remove(
+    "hidden"
+  );
+
+
+  if (unknownGoals.length === 1) {
+    reminderText.textContent =
+      "1 doelpunt zonder doelpuntenmaker";
+  } else {
+    reminderText.textContent =
+      `${unknownGoals.length} doelpunten zonder doelpuntenmaker`;
+  }
 }
 
 
@@ -758,10 +776,6 @@ function openAssignGoalDialog() {
   });
 
 
-  /*
-   * Zet bij het openen de eerste
-   * speler uit de spelerslijst klaar.
-   */
   const playerSelect =
     document.getElementById(
       "assignPlayerSelect"
@@ -841,10 +855,6 @@ function assignGoalScorer() {
   }
 
 
-  /*
-   * Speler koppelen aan het bestaande
-   * doelpunt.
-   */
   goal.playerId =
     player.id;
 
@@ -852,14 +862,14 @@ function assignGoalScorer() {
     player.naam;
 
 
+  updateUnknownGoalReminder();
+
   closeAssignGoalDialog();
 
 
   /*
-   * We maken alleen een korte
-   * tekstuele aanvulling.
-   *
-   * GEEN spelersfoto.
+   * Alleen tekst.
+   * Geen spelersfoto.
    */
   createMessage(
 `⚽ Doelpuntenmaker ${goal.scoreA}-${goal.scoreB}
@@ -907,8 +917,7 @@ function undoLastGoal(reason) {
 
 
   /*
-   * Herstel de stand van vóór
-   * de laatste goal.
+   * Stand herstellen
    */
   scoreA =
     lastGoal.previousScoreA;
@@ -920,11 +929,8 @@ function undoLastGoal(reason) {
 
 
   /*
-   * Was de teruggedraaide goal
-   * een Ulftse Boys-goal?
-   *
-   * Dan moet deze ook uit onze
-   * goalregistratie verdwijnen.
+   * Als het een Ulftse Boys-goal was,
+   * ook uit de goalregistratie verwijderen.
    */
   if (lastGoal.ownGoalId) {
     ownGoals =
@@ -933,13 +939,11 @@ function undoLastGoal(reason) {
           goal.id !==
           lastGoal.ownGoalId
       );
+
+    updateUnknownGoalReminder();
   }
 
 
-  /*
-   * Dezelfde goal kan niet nogmaals
-   * worden teruggedraaid.
-   */
   lastGoal = null;
 
   closeUndoGoalDialog();
@@ -947,9 +951,6 @@ function undoLastGoal(reason) {
 
   /*
    * AFGEKEURD
-   *
-   * Hiervoor maken we WEL
-   * een WhatsApp-bericht.
    */
   if (reason === "disallowed") {
     createMessage(
@@ -965,9 +966,6 @@ ${getTeamName("teamA")} - ${getTeamName("teamB")} | ${scoreA}-${scoreB}`
 
   /*
    * VERKEERDE INVOER
-   *
-   * Alleen score corrigeren.
-   * Niets klaarzetten voor WhatsApp.
    */
   if (reason === "mistake") {
     currentMessage = "";
@@ -1076,6 +1074,7 @@ function resetMatch() {
   nextGoalId = 1;
 
   resetGoalScorerSelect();
+  updateUnknownGoalReminder();
 
   updateScore();
 

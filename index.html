@@ -6,6 +6,7 @@
   <title>Live Score App</title>
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
   <main class="app">
 
@@ -118,6 +119,23 @@
           ↩ Laatste goal ongedaan maken
         </button>
       </div>
+
+
+      <!-- REMINDER ONBEKENDE DOELPUNTEN -->
+      <div
+        id="unknownGoalReminder"
+        class="hidden"
+        style="
+          margin-top: 12px;
+          padding: 10px 12px;
+          border-radius: 8px;
+          background: #fff3cd;
+          font-weight: 600;
+        "
+      >
+        ⚠️ <span id="unknownGoalReminderText"></span>
+      </div>
+
 
       <div class="grid">
         <label>
