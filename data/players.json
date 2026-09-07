@@ -142,5 +142,11 @@
     "naam": "Emre Cadir",
     "teamId": "UB",
     "foto": "images/spelers/emre-cadir.PNG"
+  },
+  {
+    "id": "okan-yilmaz",
+    "naam": "Okan Yilmax",
+    "teamId": "UB",
+    "foto": "images/spelers/okan-yilmaz.PNG"
   }
 ]
