@@ -79,6 +79,15 @@
         </button>
 
         <button
+          id="endResetButton"
+          class="goal hidden"
+          onclick="finishAndResetMatch()"
+        >
+          ✅ Wedstrijd afsluiten en resetten
+        </button>
+
+        <button
+          id="resetButton"
           class="danger"
           onclick="resetMatch()"
         >
@@ -121,7 +130,6 @@
       </div>
 
 
-      <!-- REMINDER ONBEKENDE DOELPUNTEN -->
       <div
         id="unknownGoalReminder"
         class="hidden"
@@ -166,7 +174,7 @@
       >
         <img
           id="photoPreview"
-          alt="Spelerfoto preview"
+          alt="Media preview"
         />
       </div>
 
@@ -178,8 +186,6 @@
       </button>
     </section>
 
-
-    <!-- DOELPUNTENMAKER LATER TOEWIJZEN -->
 
     <dialog id="assignGoalDialog">
       <h3>Doelpuntenmaker toekennen</h3>
@@ -217,8 +223,6 @@
     </dialog>
 
 
-    <!-- LAATSTE GOAL ONGEDAAN MAKEN -->
-
     <dialog id="undoGoalDialog">
       <h3>Laatste goal ongedaan maken</h3>
 
@@ -240,6 +244,35 @@
 
         <button onclick="closeUndoGoalDialog()">
           Annuleren
+        </button>
+      </div>
+    </dialog>
+
+
+    <dialog id="endMatchDialog">
+      <h3>Wedstrijd afgelopen</h3>
+
+      <p>
+        Het eindbericht staat klaar. Deel het bericht of sluit de wedstrijd af en reset de app.
+      </p>
+
+      <div class="buttons">
+        <button
+          class="share"
+          onclick="shareEndMessage()"
+        >
+          📤 Eindbericht delen
+        </button>
+
+        <button
+          class="goal"
+          onclick="finishAndResetMatch()"
+        >
+          ✅ Wedstrijd afsluiten en resetten
+        </button>
+
+        <button onclick="closeEndMatchDialog()">
+          Later
         </button>
       </div>
     </dialog>

@@ -3,150 +3,175 @@
     "id": "jelle-kniest",
     "naam": "Jelle Kniest",
     "teamId": "UB",
-    "foto": null
+    "foto": null,
+    "gif": null
   },
   {
     "id": "stijn-tiecken",
     "naam": "Stijn Tiecken",
     "teamId": "UB",
-    "foto": "images/spelers/stijn-tiecken.PNG"
+    "foto": "images/spelers/stijn-tiecken.PNG",
+    "gif": null
   },
   {
     "id": "jochem-robben",
     "naam": "Jochem Robben",
     "teamId": "UB",
-    "foto": "images/spelers/jochem-robben.PNG"
+    "foto": "images/spelers/jochem-robben.PNG",
+    "gif": null
   },
   {
     "id": "wouter-bluemink",
     "naam": "Wouter Bluemink",
     "teamId": "UB",
-    "foto": "images/spelers/wouter-bluemink.PNG"
+    "foto": "images/spelers/wouter-bluemink.PNG",
+    "gif": null
   },
   {
     "id": "pim-slutter",
     "naam": "Pim Slutter",
     "teamId": "UB",
-    "foto": "images/spelers/pim-slutter.PNG"
+    "foto": "images/spelers/pim-slutter.PNG",
+    "gif": null
   },
   {
     "id": "noah-van-hal",
     "naam": "Noah van Hal",
     "teamId": "UB",
-    "foto": "images/spelers/noah-van-hal.PNG"
+    "foto": "images/spelers/noah-van-hal.PNG",
+    "gif": null
   },
   {
     "id": "twan-kraan",
     "naam": "Twan Kraan",
     "teamId": "UB",
-    "foto": "images/spelers/twan-kraan.PNG"
+    "foto": "images/spelers/twan-kraan.PNG",
+    "gif": null
   },
   {
     "id": "joep-nijenhuis",
     "naam": "Joep Nijenhuis",
     "teamId": "UB",
-    "foto": null
+    "foto": null,
+    "gif": null
   },
   {
     "id": "max-te-lintum",
     "naam": "Max te Lintum",
     "teamId": "UB",
-    "foto": "images/spelers/max-te-lintum.PNG"
+    "foto": "images/spelers/max-te-lintum.PNG",
+    "gif": null
   },
   {
     "id": "joris-beumer",
     "naam": "Joris Beumer",
     "teamId": "UB",
-    "foto": "images/spelers/joris-beumer.PNG"
+    "foto": "images/spelers/joris-beumer.PNG",
+    "gif": null
   },
   {
     "id": "cas-heuvels",
     "naam": "Cas Heuvels",
     "teamId": "UB",
-    "foto": "images/spelers/cas-heuvels.PNG"
+    "foto": "images/spelers/cas-heuvels.PNG",
+    "gif": null
   },
   {
     "id": "devin-zweekhorst",
     "naam": "Devin Zweekhorst",
     "teamId": "UB",
-    "foto": null
+    "foto": null,
+    "gif": null
   },
   {
     "id": "mats-hegman",
     "naam": "Mats Hegman",
     "teamId": "UB",
-    "foto": null
+    "foto": null,
+    "gif": null
   },
   {
     "id": "roel-gebbinck",
     "naam": "Roel Gebbinck",
     "teamId": "UB",
-    "foto": null
+    "foto": null,
+    "gif": null
   },
   {
     "id": "dirk-slutter",
     "naam": "Dirk Slutter",
     "teamId": "UB",
-    "foto": null
+    "foto": null,
+    "gif": null
   },
   {
     "id": "ties-smeitink",
     "naam": "Ties Smeitink",
     "teamId": "UB",
-    "foto": "images/spelers/ties-smeitink.PNG"
+    "foto": "images/spelers/ties-smeitink.PNG",
+    "gif": null
   },
   {
     "id": "luuk-aalders",
     "naam": "Luuk Aalders",
     "teamId": "UB",
-    "foto": "images/spelers/luuk-aalders.PNG"
+    "foto": "images/spelers/luuk-aalders.PNG",
+    "gif": null
   },
   {
     "id": "jarl-erinkveld",
     "naam": "Jarl Erinkveld",
     "teamId": "UB",
-    "foto": "images/spelers/jarl-erinkveld.PNG"
+    "foto": "images/spelers/jarl-erinkveld.PNG",
+    "gif": null
   },
   {
     "id": "kees-weijers",
     "naam": "Kees Weijers",
     "teamId": "UB",
-    "foto": "images/spelers/kees-weijers.PNG"
+    "foto": "images/spelers/kees-weijers.PNG",
+    "gif": null
   },
   {
     "id": "sep-te-lintum",
     "naam": "Sep te Lintum",
     "teamId": "UB",
-    "foto": null
+    "foto": null,
+    "gif": null
   },
   {
     "id": "tygo-egberts",
     "naam": "Tygo Egberts",
     "teamId": "UB",
-    "foto": "images/spelers/tygo-egberts.PNG"
+    "foto": "images/spelers/tygo-egberts.PNG",
+    "gif": null
   },
   {
     "id": "sevki-nohut",
     "naam": "Sevki Nohut",
     "teamId": "UB",
-    "foto": null
+    "foto": null,
+    "gif": null
   },
   {
     "id": "dylan-rutjes",
     "naam": "Dylan Rutjes",
     "teamId": "UB",
-    "foto": null
+    "foto": null,
+    "gif": null
   },
   {
     "id": "emre-cadir",
     "naam": "Emre Cadir",
     "teamId": "UB",
-    "foto": "images/spelers/emre-cadir.PNG"
+    "foto": "images/spelers/emre-cadir.PNG",
+    "gif": null
   },
   {
     "id": "okan-yilmaz",
     "naam": "Okan Yilmaz",
     "teamId": "UB",
-    "foto": "images/spelers/okan-yilmaz.PNG"
+    "foto": null,
+    "gif": null
   }
 ]
