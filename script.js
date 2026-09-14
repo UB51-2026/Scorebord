@@ -32,7 +32,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   updateTeamNames();
   updateScore();
   updateUnknownGoalReminder();
-  updateEndResetButton();
   restoreMessagePreview();
   updateStatusFromMatchState();
 
@@ -327,7 +326,6 @@ function startMatch() {
   matchStatus = "first_half";
 
   setStatus("1e helft loopt");
-  updateEndResetButton();
 
   createMessage(
 `⚽ De wedstrijd tussen ${getTeamName("teamA")} - ${getTeamName("teamB")} is gestart! 🔥
@@ -386,10 +384,10 @@ Kom op Boys! 🔴⚪🔵`
 
 function endMatch() {
   pausedMinute = getCurrentMinute();
+
   matchStatus = "ended";
 
   setStatus("Afgelopen");
-  updateEndResetButton();
 
   createMessage(
 `🏁 Einde wedstrijd!
@@ -403,7 +401,7 @@ Blijf ons via het kanaal volgen voor alle actuele nieuwtjes en tussenstanden ron
 
   saveMatchState();
 
-  document.getElementById("endMatchDialog").showModal();
+  shareWhatsApp();
 }
 
 
@@ -428,28 +426,6 @@ function finishAndResetMatch() {
 }
 
 
-function updateEndResetButton() {
-  const endResetButton = document.getElementById("endResetButton");
-  const resetButton = document.getElementById("resetButton");
-
-  if (matchStatus === "ended") {
-    if (endResetButton) {
-      endResetButton.classList.remove("hidden");
-    }
-
-    if (resetButton) {
-      resetButton.classList.add("hidden");
-    }
-  } else {
-    if (endResetButton) {
-      endResetButton.classList.add("hidden");
-    }
-
-    if (resetButton) {
-      resetButton.classList.remove("hidden");
-    }
-  }
-}
 
 
 /* ========================================
@@ -877,7 +853,6 @@ function resetMatch(skipConfirm = false) {
 
   resetGoalScorerSelect();
   updateUnknownGoalReminder();
-  updateEndResetButton();
 
   updateScore();
   setStatus("Nog niet gestart");
