@@ -13,7 +13,7 @@ let secondHalfStartedAt = null;
 let pausedMinute = 0;
 
 let currentMessage = "";
-let currentPhotoPath = null;
+let currentMediaPath = null;
 let currentFallbackMediaPath = null;
 
 let lastGoal = null;
@@ -60,9 +60,14 @@ async function loadData() {
 ======================================== */
 
 function saveMatchState() {
-  const matchType = document.getElementById("matchType")?.value || "voorbereiding";
-  const teamA = document.getElementById("teamA")?.value || "";
-  const teamB = document.getElementById("teamB")?.value || "";
+  const matchType =
+    document.getElementById("matchType")?.value || "voorbereiding";
+
+  const teamA =
+    document.getElementById("teamA")?.value || "";
+
+  const teamB =
+    document.getElementById("teamB")?.value || "";
 
   const state = {
     matchType,
@@ -75,19 +80,23 @@ function saveMatchState() {
     secondHalfStartedAt,
     pausedMinute,
     currentMessage,
-    currentPhotoPath,
+    currentMediaPath,
     currentFallbackMediaPath,
     lastGoal,
     ownGoals,
     nextGoalId
   };
 
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(state)
+  );
 }
 
 
 function restoreMatchState() {
-  const raw = localStorage.getItem(STORAGE_KEY);
+  const raw =
+    localStorage.getItem(STORAGE_KEY);
 
   if (!raw) {
     return;
@@ -96,55 +105,120 @@ function restoreMatchState() {
   try {
     const state = JSON.parse(raw);
 
-    if (!state || typeof state !== "object") {
+    if (
+      !state ||
+      typeof state !== "object"
+    ) {
       return;
     }
 
-    const matchTypeSelect = document.getElementById("matchType");
+    const matchTypeSelect =
+      document.getElementById("matchType");
 
-    if (state.matchType && matchTypeSelect) {
-      matchTypeSelect.value = state.matchType;
+    if (
+      state.matchType &&
+      matchTypeSelect
+    ) {
+      matchTypeSelect.value =
+        state.matchType;
+
       fillTeamDropdowns();
     }
 
-    const teamASelect = document.getElementById("teamA");
-    const teamBSelect = document.getElementById("teamB");
+    const teamASelect =
+      document.getElementById("teamA");
 
-    if (state.teamA && teamASelect) {
-      teamASelect.value = state.teamA;
+    const teamBSelect =
+      document.getElementById("teamB");
+
+    if (
+      state.teamA &&
+      teamASelect
+    ) {
+      teamASelect.value =
+        state.teamA;
     }
 
-    if (state.teamB && teamBSelect) {
-      teamBSelect.value = state.teamB;
+    if (
+      state.teamB &&
+      teamBSelect
+    ) {
+      teamBSelect.value =
+        state.teamB;
     }
 
     preventSameTeams("teamA");
 
-    scoreA = Number.isFinite(state.scoreA) ? state.scoreA : 0;
-    scoreB = Number.isFinite(state.scoreB) ? state.scoreB : 0;
+    scoreA =
+      Number.isFinite(state.scoreA)
+        ? state.scoreA
+        : 0;
 
-    matchStatus = state.matchStatus || "not_started";
-    firstHalfStartedAt = state.firstHalfStartedAt || null;
-    secondHalfStartedAt = state.secondHalfStartedAt || null;
-    pausedMinute = Number.isFinite(state.pausedMinute) ? state.pausedMinute : 0;
+    scoreB =
+      Number.isFinite(state.scoreB)
+        ? state.scoreB
+        : 0;
 
-    currentMessage = state.currentMessage || "";
-    currentPhotoPath = state.currentPhotoPath || null;
-    currentFallbackMediaPath = state.currentFallbackMediaPath || null;
+    matchStatus =
+      state.matchStatus ||
+      "not_started";
 
-    lastGoal = state.lastGoal || null;
-    ownGoals = Array.isArray(state.ownGoals) ? state.ownGoals : [];
-    nextGoalId = Number.isFinite(state.nextGoalId) ? state.nextGoalId : 1;
+    firstHalfStartedAt =
+      state.firstHalfStartedAt ||
+      null;
+
+    secondHalfStartedAt =
+      state.secondHalfStartedAt ||
+      null;
+
+    pausedMinute =
+      Number.isFinite(state.pausedMinute)
+        ? state.pausedMinute
+        : 0;
+
+    currentMessage =
+      state.currentMessage ||
+      "";
+
+    // Compatibel met oude opslag waarin currentPhotoPath werd gebruikt.
+    currentMediaPath =
+      state.currentMediaPath ||
+      state.currentPhotoPath ||
+      null;
+
+    currentFallbackMediaPath =
+      state.currentFallbackMediaPath ||
+      null;
+
+    lastGoal =
+      state.lastGoal ||
+      null;
+
+    ownGoals =
+      Array.isArray(state.ownGoals)
+        ? state.ownGoals
+        : [];
+
+    nextGoalId =
+      Number.isFinite(state.nextGoalId)
+        ? state.nextGoalId
+        : 1;
 
     updateTeamNames();
+
   } catch (error) {
-    console.error("Opgeslagen wedstrijd kon niet worden hersteld:", error);
+    console.error(
+      "Opgeslagen wedstrijd kon niet worden hersteld:",
+      error
+    );
   }
 }
 
 
 function clearMatchState() {
-  localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(
+    STORAGE_KEY
+  );
 }
 
 
@@ -153,34 +227,69 @@ function clearMatchState() {
 ======================================== */
 
 function fillTeamDropdowns() {
-  const teamA = document.getElementById("teamA");
-  const teamB = document.getElementById("teamB");
-  const matchType = document.getElementById("matchType");
+  const teamA =
+    document.getElementById("teamA");
+
+  const teamB =
+    document.getElementById("teamB");
+
+  const matchType =
+    document.getElementById("matchType");
 
   teamA.innerHTML = "";
   teamB.innerHTML = "";
 
-  const selectedType = matchType ? matchType.value : "voorbereiding";
+  const selectedType =
+    matchType
+      ? matchType.value
+      : "voorbereiding";
 
-  const filteredTeams = teams.filter(team =>
-    team.types && team.types.includes(selectedType)
-  );
+  const filteredTeams =
+    teams.filter(team =>
+      team.types &&
+      team.types.includes(
+        selectedType
+      )
+    );
 
   filteredTeams.forEach(team => {
-    teamA.add(new Option(team.naam, team.id));
-    teamB.add(new Option(team.naam, team.id));
+    teamA.add(
+      new Option(
+        team.naam,
+        team.id
+      )
+    );
+
+    teamB.add(
+      new Option(
+        team.naam,
+        team.id
+      )
+    );
   });
 
-  const ownIndex = filteredTeams.findIndex(t => t.id === ownClubId);
+  const ownIndex =
+    filteredTeams.findIndex(
+      team =>
+        team.id === ownClubId
+    );
 
   if (ownIndex >= 0) {
-    teamA.selectedIndex = ownIndex;
+    teamA.selectedIndex =
+      ownIndex;
   }
 
-  const firstOpponentIndex = filteredTeams.findIndex(t => t.id !== ownClubId);
+  const firstOpponentIndex =
+    filteredTeams.findIndex(
+      team =>
+        team.id !== ownClubId
+    );
 
-  if (firstOpponentIndex >= 0) {
-    teamB.selectedIndex = firstOpponentIndex;
+  if (
+    firstOpponentIndex >= 0
+  ) {
+    teamB.selectedIndex =
+      firstOpponentIndex;
   }
 
   preventSameTeams("teamA");
@@ -207,23 +316,45 @@ function fillTeamDropdowns() {
 }
 
 
-function preventSameTeams(changedSelectId) {
-  const teamA = document.getElementById("teamA");
-  const teamB = document.getElementById("teamB");
+function preventSameTeams(
+  changedSelectId
+) {
+  const teamA =
+    document.getElementById("teamA");
+
+  const teamB =
+    document.getElementById("teamB");
 
   if (!teamA || !teamB) {
     return;
   }
 
-  if (teamA.value !== teamB.value) {
+  if (
+    teamA.value !==
+    teamB.value
+  ) {
     return;
   }
 
-  const changedSelect = document.getElementById(changedSelectId);
-  const otherSelect = changedSelectId === "teamA" ? teamB : teamA;
+  const changedSelect =
+    document.getElementById(
+      changedSelectId
+    );
 
-  for (let i = 0; i < otherSelect.options.length; i++) {
-    if (otherSelect.options[i].value !== changedSelect.value) {
+  const otherSelect =
+    changedSelectId === "teamA"
+      ? teamB
+      : teamA;
+
+  for (
+    let i = 0;
+    i < otherSelect.options.length;
+    i++
+  ) {
+    if (
+      otherSelect.options[i].value !==
+      changedSelect.value
+    ) {
       otherSelect.selectedIndex = i;
       break;
     }
@@ -232,16 +363,33 @@ function preventSameTeams(changedSelectId) {
 
 
 function updateTeamNames() {
-  document.getElementById("teamAName").textContent = getTeamName("teamA");
-  document.getElementById("teamBName").textContent = getTeamName("teamB");
+  document.getElementById(
+    "teamAName"
+  ).textContent =
+    getTeamName("teamA");
+
+  document.getElementById(
+    "teamBName"
+  ).textContent =
+    getTeamName("teamB");
 }
 
 
 function getTeamName(selectId) {
-  const teamId = document.getElementById(selectId)?.value;
-  const team = teams.find(t => t.id === teamId);
+  const teamId =
+    document.getElementById(
+      selectId
+    )?.value;
 
-  return team ? team.naam : "";
+  const team =
+    teams.find(
+      team =>
+        team.id === teamId
+    );
+
+  return team
+    ? team.naam
+    : "";
 }
 
 
@@ -250,52 +398,118 @@ function getTeamName(selectId) {
 ======================================== */
 
 function loadOwnClubPlayers() {
-  const ownClubPlayers = players.filter(p => p.teamId === ownClubId);
+  const ownClubPlayers =
+    players.filter(
+      player =>
+        player.teamId ===
+        ownClubId
+    );
 
-  fillGoalScorerSelect("playerSelect", ownClubPlayers);
-  fillPlayerSelect("playerOut", ownClubPlayers);
-  fillPlayerSelect("playerIn", ownClubPlayers);
-  fillPlayerSelect("assignPlayerSelect", ownClubPlayers);
+  fillGoalScorerSelect(
+    "playerSelect",
+    ownClubPlayers
+  );
+
+  fillPlayerSelect(
+    "playerOut",
+    ownClubPlayers
+  );
+
+  fillPlayerSelect(
+    "playerIn",
+    ownClubPlayers
+  );
+
+  fillPlayerSelect(
+    "assignPlayerSelect",
+    ownClubPlayers
+  );
 }
 
 
-function fillGoalScorerSelect(elementId, playerList) {
-  const select = document.getElementById(elementId);
+function fillGoalScorerSelect(
+  elementId,
+  playerList
+) {
+  const select =
+    document.getElementById(
+      elementId
+    );
+
   select.innerHTML = "";
 
-  select.add(new Option("Onbekend", ""));
+  select.add(
+    new Option(
+      "Onbekend",
+      ""
+    )
+  );
 
-  playerList.forEach(player => {
-    select.add(new Option(player.naam, player.id));
-  });
+  playerList.forEach(
+    player => {
+      select.add(
+        new Option(
+          player.naam,
+          player.id
+        )
+      );
+    }
+  );
 
   select.value = "";
 }
 
 
-function fillPlayerSelect(elementId, playerList) {
-  const select = document.getElementById(elementId);
+function fillPlayerSelect(
+  elementId,
+  playerList
+) {
+  const select =
+    document.getElementById(
+      elementId
+    );
+
   select.innerHTML = "";
 
-  playerList.forEach(player => {
-    select.add(new Option(player.naam, player.id));
-  });
+  playerList.forEach(
+    player => {
+      select.add(
+        new Option(
+          player.naam,
+          player.id
+        )
+      );
+    }
+  );
 }
 
 
-function getSelectedPlayer(selectId) {
-  const playerId = document.getElementById(selectId).value;
+function getSelectedPlayer(
+  selectId
+) {
+  const playerId =
+    document.getElementById(
+      selectId
+    ).value;
 
   if (!playerId) {
     return null;
   }
 
-  return players.find(p => p.id === playerId) || null;
+  return (
+    players.find(
+      player =>
+        player.id === playerId
+    ) || null
+  );
 }
 
 
 function resetGoalScorerSelect() {
-  const select = document.getElementById("playerSelect");
+  const select =
+    document.getElementById(
+      "playerSelect"
+    );
 
   if (select) {
     select.value = "";
@@ -304,7 +518,7 @@ function resetGoalScorerSelect() {
 
 
 /* ========================================
-   WEDSTRIJD GESTART
+   START WEDSTRIJD
 ======================================== */
 
 function startMatch() {
@@ -320,12 +534,20 @@ function startMatch() {
 
   updateScore();
 
-  firstHalfStartedAt = Date.now();
-  secondHalfStartedAt = null;
-  pausedMinute = 0;
-  matchStatus = "first_half";
+  firstHalfStartedAt =
+    Date.now();
 
-  setStatus("1e helft loopt");
+  secondHalfStartedAt =
+    null;
+
+  pausedMinute = 0;
+
+  matchStatus =
+    "first_half";
+
+  setStatus(
+    "1e helft loopt"
+  );
 
   createMessage(
 `⚽ De wedstrijd tussen ${getTeamName("teamA")} - ${getTeamName("teamB")} is gestart! 🔥
@@ -342,8 +564,11 @@ Succes Boys! 🔴⚪🔵`
 ======================================== */
 
 function halfTime() {
-  pausedMinute = getCurrentMinute();
-  matchStatus = "half_time";
+  pausedMinute =
+    getCurrentMinute();
+
+  matchStatus =
+    "half_time";
 
   setStatus("Rust");
 
@@ -363,10 +588,15 @@ ${getTeamName("teamA")} - ${getTeamName("teamB")} | ${scoreA}-${scoreB}`
 ======================================== */
 
 function startSecondHalf() {
-  secondHalfStartedAt = Date.now();
-  matchStatus = "second_half";
+  secondHalfStartedAt =
+    Date.now();
 
-  setStatus("2e helft loopt");
+  matchStatus =
+    "second_half";
+
+  setStatus(
+    "2e helft loopt"
+  );
 
   createMessage(
 `⚽ We zijn begonnen met de tweede helft! 🔥
@@ -383,9 +613,11 @@ Kom op Boys! 🔴⚪🔵`
 ======================================== */
 
 function endMatch() {
-  pausedMinute = getCurrentMinute();
+  pausedMinute =
+    getCurrentMinute();
 
-  matchStatus = "ended";
+  matchStatus =
+    "ended";
 
   setStatus("Afgelopen");
 
@@ -405,45 +637,35 @@ Blijf ons via het kanaal volgen voor alle actuele nieuwtjes en tussenstanden ron
 }
 
 
-async function shareEndMessage() {
-  closeEndMatchDialog();
-  await shareWhatsApp();
-}
-
-
-function closeEndMatchDialog() {
-  const dialog = document.getElementById("endMatchDialog");
-
-  if (dialog.open) {
-    dialog.close();
-  }
-}
-
-
-function finishAndResetMatch() {
-  closeEndMatchDialog();
-  resetMatch(true);
-}
-
-
-
-
 /* ========================================
-   ULFTSE BOYS-GOAL REGISTREREN
+   ULFTSE BOYS GOAL REGISTREREN
 ======================================== */
 
-function registerOwnGoal(minute, player) {
+function registerOwnGoal(
+  minute,
+  player
+) {
   const goal = {
     id: nextGoalId++,
     minute,
-    minuteText: formatMatchMinute(minute),
+    minuteText:
+      formatMatchMinute(
+        minute
+      ),
     scoreA,
     scoreB,
-    playerId: player ? player.id : null,
-    playerName: player ? player.naam : null
+    playerId:
+      player
+        ? player.id
+        : null,
+    playerName:
+      player
+        ? player.naam
+        : null
   };
 
   ownGoals.push(goal);
+
   updateUnknownGoalReminder();
 
   return goal;
@@ -451,18 +673,52 @@ function registerOwnGoal(minute, player) {
 
 
 function getOwnScore() {
-  const teamAId = document.getElementById("teamA").value;
-  return teamAId === ownClubId ? scoreA : scoreB;
+  const teamAId =
+    document.getElementById(
+      "teamA"
+    ).value;
+
+  return (
+    teamAId === ownClubId
+      ? scoreA
+      : scoreB
+  );
 }
 
 
 function getOpponentScore() {
-  const teamAId = document.getElementById("teamA").value;
-  return teamAId === ownClubId ? scoreB : scoreA;
+  const teamAId =
+    document.getElementById(
+      "teamA"
+    ).value;
+
+  return (
+    teamAId === ownClubId
+      ? scoreB
+      : scoreA
+  );
 }
 
 
-function getGoalMediaForPlayer(player) {
+/*
+  MEDIAREGEL:
+
+  UB staat NA het doelpunt nog achter:
+  -> normale spelersfoto
+
+  UB staat NA het doelpunt gelijk of voor:
+  -> video
+
+  Video ontbreekt:
+  -> foto
+
+  Foto ontbreekt:
+  -> alleen tekst
+*/
+
+function getGoalMediaForPlayer(
+  player
+) {
   if (!player) {
     return {
       primary: null,
@@ -470,25 +726,47 @@ function getGoalMediaForPlayer(player) {
     };
   }
 
-  const ownScore = getOwnScore();
-  const opponentScore = getOpponentScore();
+  const ownScore =
+    getOwnScore();
 
-  if (ownScore >= opponentScore) {
+  const opponentScore =
+    getOpponentScore();
+
+  if (
+    ownScore >= opponentScore
+  ) {
     return {
-      primary: normalizeMediaPath(player.gif),
-      fallback: normalizeMediaPath(player.foto)
+      primary:
+        normalizeMediaPath(
+          player.video
+        ),
+
+      fallback:
+        normalizeMediaPath(
+          player.foto
+        )
     };
   }
 
   return {
-    primary: normalizeMediaPath(player.foto),
+    primary:
+      normalizeMediaPath(
+        player.foto
+      ),
+
     fallback: null
   };
 }
 
 
-function normalizeMediaPath(value) {
-  if (!value || value === "null" || value === "undefined") {
+function normalizeMediaPath(
+  value
+) {
+  if (
+    !value ||
+    value === "null" ||
+    value === "undefined"
+  ) {
     return null;
   }
 
@@ -501,26 +779,50 @@ function normalizeMediaPath(value) {
 ======================================== */
 
 function goalTeamA() {
-  const teamAId = document.getElementById("teamA").value;
-  const minute = getCurrentMinute();
+  const teamAId =
+    document.getElementById(
+      "teamA"
+    ).value;
+
+  const minute =
+    getCurrentMinute();
 
   lastGoal = {
-    previousScoreA: scoreA,
-    previousScoreB: scoreB,
+    previousScoreA:
+      scoreA,
+
+    previousScoreB:
+      scoreB,
+
     ownGoalId: null
   };
 
-  if (teamAId === ownClubId) {
-    const player = getSelectedPlayer("playerSelect");
+  if (
+    teamAId === ownClubId
+  ) {
+    const player =
+      getSelectedPlayer(
+        "playerSelect"
+      );
 
     scoreA++;
+
     updateScore();
 
-    const goal = registerOwnGoal(minute, player);
-    lastGoal.ownGoalId = goal.id;
+    const goal =
+      registerOwnGoal(
+        minute,
+        player
+      );
+
+    lastGoal.ownGoalId =
+      goal.id;
 
     if (player) {
-      const media = getGoalMediaForPlayer(player);
+      const media =
+        getGoalMediaForPlayer(
+          player
+        );
 
       createMessage(
 `⚽🔥 GOOOAAALLL ULFTSE BOYS!!!
@@ -531,6 +833,7 @@ ${formatMatchMinute(minute)} | ${getTeamName("teamA")} - ${getTeamName("teamB")}
         media.primary,
         media.fallback
       );
+
     } else {
       createMessage(
 `⚽🔥 GOOOAAALLL ULFTSE BOYS!!!
@@ -540,11 +843,14 @@ ${formatMatchMinute(minute)} | ${getTeamName("teamA")} - ${getTeamName("teamB")}
     }
 
     resetGoalScorerSelect();
+
     saveMatchState();
+
     return;
   }
 
   scoreA++;
+
   updateScore();
 
   createMessage(
@@ -562,26 +868,50 @@ ${formatMatchMinute(minute)} | ${getTeamName("teamA")} - ${getTeamName("teamB")}
 ======================================== */
 
 function goalTeamB() {
-  const teamBId = document.getElementById("teamB").value;
-  const minute = getCurrentMinute();
+  const teamBId =
+    document.getElementById(
+      "teamB"
+    ).value;
+
+  const minute =
+    getCurrentMinute();
 
   lastGoal = {
-    previousScoreA: scoreA,
-    previousScoreB: scoreB,
+    previousScoreA:
+      scoreA,
+
+    previousScoreB:
+      scoreB,
+
     ownGoalId: null
   };
 
-  if (teamBId === ownClubId) {
-    const player = getSelectedPlayer("playerSelect");
+  if (
+    teamBId === ownClubId
+  ) {
+    const player =
+      getSelectedPlayer(
+        "playerSelect"
+      );
 
     scoreB++;
+
     updateScore();
 
-    const goal = registerOwnGoal(minute, player);
-    lastGoal.ownGoalId = goal.id;
+    const goal =
+      registerOwnGoal(
+        minute,
+        player
+      );
+
+    lastGoal.ownGoalId =
+      goal.id;
 
     if (player) {
-      const media = getGoalMediaForPlayer(player);
+      const media =
+        getGoalMediaForPlayer(
+          player
+        );
 
       createMessage(
 `⚽🔥 GOOOAAALLL ULFTSE BOYS!!!
@@ -592,6 +922,7 @@ ${formatMatchMinute(minute)} | ${getTeamName("teamA")} - ${getTeamName("teamB")}
         media.primary,
         media.fallback
       );
+
     } else {
       createMessage(
 `⚽🔥 GOOOAAALLL ULFTSE BOYS!!!
@@ -601,11 +932,14 @@ ${formatMatchMinute(minute)} | ${getTeamName("teamA")} - ${getTeamName("teamB")}
     }
 
     resetGoalScorerSelect();
+
     saveMatchState();
+
     return;
   }
 
   scoreB++;
+
   updateScore();
 
   createMessage(
@@ -623,32 +957,59 @@ ${formatMatchMinute(minute)} | ${getTeamName("teamA")} - ${getTeamName("teamB")}
 ======================================== */
 
 function getUnknownGoals() {
-  return ownGoals.filter(goal => !goal.playerId);
+  return ownGoals.filter(
+    goal =>
+      !goal.playerId
+  );
 }
 
 
 function updateUnknownGoalReminder() {
-  const reminder = document.getElementById("unknownGoalReminder");
-  const reminderText = document.getElementById("unknownGoalReminderText");
+  const reminder =
+    document.getElementById(
+      "unknownGoalReminder"
+    );
 
-  if (!reminder || !reminderText) {
+  const reminderText =
+    document.getElementById(
+      "unknownGoalReminderText"
+    );
+
+  if (
+    !reminder ||
+    !reminderText
+  ) {
     return;
   }
 
-  const unknownGoals = getUnknownGoals();
+  const unknownGoals =
+    getUnknownGoals();
 
-  if (unknownGoals.length === 0) {
-    reminder.classList.add("hidden");
-    reminderText.textContent = "";
+  if (
+    unknownGoals.length === 0
+  ) {
+    reminder.classList.add(
+      "hidden"
+    );
+
+    reminderText.textContent =
+      "";
+
     return;
   }
 
-  reminder.classList.remove("hidden");
+  reminder.classList.remove(
+    "hidden"
+  );
 
-  if (unknownGoals.length === 1) {
-    reminderText.textContent = "1 doelpunt zonder doelpuntenmaker";
+  if (
+    unknownGoals.length === 1
+  ) {
+    reminderText.textContent =
+      "1 doelpunt zonder doelpuntenmaker";
   } else {
-    reminderText.textContent = `${unknownGoals.length} doelpunten zonder doelpuntenmaker`;
+    reminderText.textContent =
+      `${unknownGoals.length} doelpunten zonder doelpuntenmaker`;
   }
 }
 
@@ -658,62 +1019,119 @@ function updateUnknownGoalReminder() {
 ======================================== */
 
 function openAssignGoalDialog() {
-  const unknownGoals = getUnknownGoals();
+  const unknownGoals =
+    getUnknownGoals();
 
-  if (unknownGoals.length === 0) {
-    alert("Er zijn geen doelpunten zonder doelpuntenmaker.");
+  if (
+    unknownGoals.length === 0
+  ) {
+    alert(
+      "Er zijn geen doelpunten zonder doelpuntenmaker."
+    );
+
     return;
   }
 
-  const goalSelect = document.getElementById("unknownGoalSelect");
+  const goalSelect =
+    document.getElementById(
+      "unknownGoalSelect"
+    );
+
   goalSelect.innerHTML = "";
 
-  unknownGoals.forEach(goal => {
-    const label = `${goal.minuteText} | ${goal.scoreA}-${goal.scoreB} | Onbekend`;
-    goalSelect.add(new Option(label, goal.id));
-  });
+  unknownGoals.forEach(
+    goal => {
+      const label =
+        `${goal.minuteText} | ${goal.scoreA}-${goal.scoreB} | Onbekend`;
 
-  const playerSelect = document.getElementById("assignPlayerSelect");
+      goalSelect.add(
+        new Option(
+          label,
+          goal.id
+        )
+      );
+    }
+  );
 
-  if (playerSelect && playerSelect.options.length > 0) {
-    playerSelect.selectedIndex = 0;
+  const playerSelect =
+    document.getElementById(
+      "assignPlayerSelect"
+    );
+
+  if (
+    playerSelect &&
+    playerSelect.options.length > 0
+  ) {
+    playerSelect.selectedIndex =
+      0;
   }
 
-  document.getElementById("assignGoalDialog").showModal();
+  document.getElementById(
+    "assignGoalDialog"
+  ).showModal();
 }
 
 
 function closeAssignGoalDialog() {
-  document.getElementById("assignGoalDialog").close();
+  document.getElementById(
+    "assignGoalDialog"
+  ).close();
 }
 
 
 function assignGoalScorer() {
-  const goalId = Number(document.getElementById("unknownGoalSelect").value);
-  const player = getSelectedPlayer("assignPlayerSelect");
+  const goalId =
+    Number(
+      document.getElementById(
+        "unknownGoalSelect"
+      ).value
+    );
+
+  const player =
+    getSelectedPlayer(
+      "assignPlayerSelect"
+    );
 
   if (!goalId) {
-    alert("Kies eerst een doelpunt.");
+    alert(
+      "Kies eerst een doelpunt."
+    );
+
     return;
   }
 
   if (!player) {
-    alert("Kies eerst een speler.");
+    alert(
+      "Kies eerst een speler."
+    );
+
     return;
   }
 
-  const goal = ownGoals.find(goal => goal.id === goalId);
+  const goal =
+    ownGoals.find(
+      goal =>
+        goal.id === goalId
+    );
 
   if (!goal) {
-    alert("Het doelpunt kon niet worden gevonden.");
+    alert(
+      "Het doelpunt kon niet worden gevonden."
+    );
+
     closeAssignGoalDialog();
+
     return;
   }
 
-  goal.playerId = player.id;
-  goal.playerName = player.naam;
+  goal.playerId =
+    player.id;
+
+  goal.playerName =
+    player.naam;
 
   updateUnknownGoalReminder();
+
   closeAssignGoalDialog();
 
   createMessage(
@@ -732,16 +1150,23 @@ De ${goal.scoreA}-${goal.scoreB} van Ulftse Boys werd gemaakt door ${player.naam
 
 function openUndoGoalDialog() {
   if (!lastGoal) {
-    alert("Er is geen doelpunt om terug te draaien.");
+    alert(
+      "Er is geen doelpunt om terug te draaien."
+    );
+
     return;
   }
 
-  document.getElementById("undoGoalDialog").showModal();
+  document.getElementById(
+    "undoGoalDialog"
+  ).showModal();
 }
 
 
 function closeUndoGoalDialog() {
-  document.getElementById("undoGoalDialog").close();
+  document.getElementById(
+    "undoGoalDialog"
+  ).close();
 }
 
 
@@ -751,20 +1176,34 @@ function undoLastGoal(reason) {
     return;
   }
 
-  scoreA = lastGoal.previousScoreA;
-  scoreB = lastGoal.previousScoreB;
+  scoreA =
+    lastGoal.previousScoreA;
+
+  scoreB =
+    lastGoal.previousScoreB;
 
   updateScore();
 
-  if (lastGoal.ownGoalId) {
-    ownGoals = ownGoals.filter(goal => goal.id !== lastGoal.ownGoalId);
+  if (
+    lastGoal.ownGoalId
+  ) {
+    ownGoals =
+      ownGoals.filter(
+        goal =>
+          goal.id !==
+          lastGoal.ownGoalId
+      );
+
     updateUnknownGoalReminder();
   }
 
   lastGoal = null;
+
   closeUndoGoalDialog();
 
-  if (reason === "disallowed") {
+  if (
+    reason === "disallowed"
+  ) {
     createMessage(
 `❌ Doelpunt afgekeurd
 
@@ -773,18 +1212,28 @@ ${getTeamName("teamA")} - ${getTeamName("teamB")} | ${scoreA}-${scoreB}`
     );
 
     saveMatchState();
+
     return;
   }
 
-  if (reason === "mistake") {
+  if (
+    reason === "mistake"
+  ) {
     currentMessage = "";
-    currentPhotoPath = null;
-    currentFallbackMediaPath = null;
 
-    document.getElementById("messagePreview").textContent =
+    currentMediaPath =
+      null;
+
+    currentFallbackMediaPath =
+      null;
+
+    document.getElementById(
+      "messagePreview"
+    ).textContent =
       "Laatste goal verwijderd wegens verkeerde invoer.";
 
     clearMediaPreview();
+
     saveMatchState();
   }
 }
@@ -795,20 +1244,40 @@ ${getTeamName("teamA")} - ${getTeamName("teamB")} | ${scoreA}-${scoreB}`
 ======================================== */
 
 function substitution() {
-  const outPlayer = getSelectedPlayer("playerOut");
-  const inPlayer = getSelectedPlayer("playerIn");
+  const outPlayer =
+    getSelectedPlayer(
+      "playerOut"
+    );
 
-  if (!outPlayer || !inPlayer) {
-    alert("Kies speler eruit en speler erin.");
+  const inPlayer =
+    getSelectedPlayer(
+      "playerIn"
+    );
+
+  if (
+    !outPlayer ||
+    !inPlayer
+  ) {
+    alert(
+      "Kies speler eruit en speler erin."
+    );
+
     return;
   }
 
-  if (outPlayer.id === inPlayer.id) {
-    alert("Speler eruit en erin mogen niet dezelfde speler zijn.");
+  if (
+    outPlayer.id ===
+    inPlayer.id
+  ) {
+    alert(
+      "Speler eruit en erin mogen niet dezelfde speler zijn."
+    );
+
     return;
   }
 
-  const minute = getCurrentMinute();
+  const minute =
+    getCurrentMinute();
 
   createMessage(
 `🔄 ${formatMatchMinute(minute)} | Wissel Ulftse Boys
@@ -825,9 +1294,14 @@ Eruit: ${outPlayer.naam} ⬅️`
    RESET WEDSTRIJD
 ======================================== */
 
-function resetMatch(skipConfirm = false) {
+function resetMatch(
+  skipConfirm = false
+) {
   if (!skipConfirm) {
-    const confirmed = confirm("Weet je zeker dat je de wedstrijd wilt resetten?");
+    const confirmed =
+      confirm(
+        "Weet je zeker dat je de wedstrijd wilt resetten?"
+      );
 
     if (!confirmed) {
       return;
@@ -837,30 +1311,53 @@ function resetMatch(skipConfirm = false) {
   scoreA = 0;
   scoreB = 0;
 
-  matchStatus = "not_started";
+  matchStatus =
+    "not_started";
 
-  firstHalfStartedAt = null;
-  secondHalfStartedAt = null;
+  firstHalfStartedAt =
+    null;
+
+  secondHalfStartedAt =
+    null;
+
   pausedMinute = 0;
 
   currentMessage = "";
-  currentPhotoPath = null;
-  currentFallbackMediaPath = null;
+
+  currentMediaPath =
+    null;
+
+  currentFallbackMediaPath =
+    null;
 
   lastGoal = null;
+
   ownGoals = [];
+
   nextGoalId = 1;
 
   resetGoalScorerSelect();
+
   updateUnknownGoalReminder();
 
   updateScore();
-  setStatus("Nog niet gestart");
 
-  document.getElementById("minute").textContent = "0'";
-  document.getElementById("messagePreview").textContent = "Nog geen bericht.";
+  setStatus(
+    "Nog niet gestart"
+  );
+
+  document.getElementById(
+    "minute"
+  ).textContent =
+    "0'";
+
+  document.getElementById(
+    "messagePreview"
+  ).textContent =
+    "Nog geen bericht.";
 
   clearMediaPreview();
+
   clearMatchState();
 }
 
@@ -870,26 +1367,48 @@ function resetMatch(skipConfirm = false) {
 ======================================== */
 
 function updateScore() {
-  document.getElementById("scoreA").textContent = scoreA;
-  document.getElementById("scoreB").textContent = scoreB;
+  document.getElementById(
+    "scoreA"
+  ).textContent =
+    scoreA;
+
+  document.getElementById(
+    "scoreB"
+  ).textContent =
+    scoreB;
 }
 
 
 function setStatus(text) {
-  document.getElementById("status").textContent = text;
+  document.getElementById(
+    "status"
+  ).textContent =
+    text;
 }
 
 
 function updateStatusFromMatchState() {
   const statusMap = {
-    not_started: "Nog niet gestart",
-    first_half: "1e helft loopt",
-    half_time: "Rust",
-    second_half: "2e helft loopt",
-    ended: "Afgelopen"
+    not_started:
+      "Nog niet gestart",
+
+    first_half:
+      "1e helft loopt",
+
+    half_time:
+      "Rust",
+
+    second_half:
+      "2e helft loopt",
+
+    ended:
+      "Afgelopen"
   };
 
-  setStatus(statusMap[matchStatus] || "Nog niet gestart");
+  setStatus(
+    statusMap[matchStatus] ||
+    "Nog niet gestart"
+  );
 }
 
 
@@ -898,42 +1417,89 @@ function updateStatusFromMatchState() {
 ======================================== */
 
 function startTimerDisplay() {
-  const updateMinuteDisplay = () => {
-    document.getElementById("minute").textContent = formatMatchMinute(getCurrentMinute());
-  };
+  const updateMinuteDisplay =
+    () => {
+      document.getElementById(
+        "minute"
+      ).textContent =
+        formatMatchMinute(
+          getCurrentMinute()
+        );
+    };
 
   updateMinuteDisplay();
-  setInterval(updateMinuteDisplay, 1000);
+
+  setInterval(
+    updateMinuteDisplay,
+    1000
+  );
 }
 
 
 function getCurrentRawMinute() {
-  if (matchStatus === "not_started") {
+  if (
+    matchStatus ===
+    "not_started"
+  ) {
     return 0;
   }
 
-  if (matchStatus === "ended" || matchStatus === "half_time") {
+  if (
+    matchStatus === "ended" ||
+    matchStatus === "half_time"
+  ) {
     return pausedMinute;
   }
 
-  if (matchStatus === "first_half") {
-    if (!firstHalfStartedAt) {
-      return pausedMinute || 0;
+  if (
+    matchStatus ===
+    "first_half"
+  ) {
+    if (
+      !firstHalfStartedAt
+    ) {
+      return (
+        pausedMinute || 0
+      );
     }
 
-    const diff = Date.now() - firstHalfStartedAt;
+    const diff =
+      Date.now() -
+      firstHalfStartedAt;
 
-    return Math.max(1, Math.ceil(diff / 60000));
+    return Math.max(
+      1,
+      Math.ceil(
+        diff / 60000
+      )
+    );
   }
 
-  if (matchStatus === "second_half") {
-    if (!secondHalfStartedAt) {
-      return pausedMinute || 45;
+  if (
+    matchStatus ===
+    "second_half"
+  ) {
+    if (
+      !secondHalfStartedAt
+    ) {
+      return (
+        pausedMinute || 45
+      );
     }
 
-    const diff = Date.now() - secondHalfStartedAt;
+    const diff =
+      Date.now() -
+      secondHalfStartedAt;
 
-    return 45 + Math.max(1, Math.ceil(diff / 60000));
+    return (
+      45 +
+      Math.max(
+        1,
+        Math.ceil(
+          diff / 60000
+        )
+      )
+    );
   }
 
   return 0;
@@ -945,17 +1511,39 @@ function getCurrentMinute() {
 }
 
 
-function formatMatchMinute(minute) {
+function formatMatchMinute(
+  minute
+) {
   if (minute === 0) {
     return "0'";
   }
 
-  if ((matchStatus === "first_half" || matchStatus === "half_time") && minute > 45) {
-    return `45+${minute - 45}'`;
+  if (
+    (
+      matchStatus ===
+        "first_half" ||
+      matchStatus ===
+        "half_time"
+    ) &&
+    minute > 45
+  ) {
+    return (
+      `45+${minute - 45}'`
+    );
   }
 
-  if ((matchStatus === "second_half" || matchStatus === "ended") && minute > 90) {
-    return `90+${minute - 90}'`;
+  if (
+    (
+      matchStatus ===
+        "second_half" ||
+      matchStatus ===
+        "ended"
+    ) &&
+    minute > 90
+  ) {
+    return (
+      `90+${minute - 90}'`
+    );
   }
 
   return `${minute}'`;
@@ -966,73 +1554,258 @@ function formatMatchMinute(minute) {
    BERICHT + MEDIA
 ======================================== */
 
-function createMessage(text, mediaPath = null, fallbackMediaPath = null) {
+function createMessage(
+  text,
+  mediaPath = null,
+  fallbackMediaPath = null
+) {
   currentMessage = text;
-  currentPhotoPath = normalizeMediaPath(mediaPath);
-  currentFallbackMediaPath = normalizeMediaPath(fallbackMediaPath);
 
-  document.getElementById("messagePreview").textContent = text;
+  currentMediaPath =
+    normalizeMediaPath(
+      mediaPath
+    );
 
-  showMediaPreview(currentPhotoPath, currentFallbackMediaPath);
+  currentFallbackMediaPath =
+    normalizeMediaPath(
+      fallbackMediaPath
+    );
+
+  document.getElementById(
+    "messagePreview"
+  ).textContent =
+    text;
+
+  showMediaPreview(
+    currentMediaPath,
+    currentFallbackMediaPath
+  );
 }
 
 
 function restoreMessagePreview() {
   if (currentMessage) {
-    document.getElementById("messagePreview").textContent = currentMessage;
-    showMediaPreview(currentPhotoPath, currentFallbackMediaPath);
+    document.getElementById(
+      "messagePreview"
+    ).textContent =
+      currentMessage;
+
+    showMediaPreview(
+      currentMediaPath,
+      currentFallbackMediaPath
+    );
+
   } else {
-    document.getElementById("messagePreview").textContent = "Nog geen bericht.";
+    document.getElementById(
+      "messagePreview"
+    ).textContent =
+      "Nog geen bericht.";
+
     clearMediaPreview();
   }
 }
 
 
-function showMediaPreview(primaryPath, fallbackPath = null) {
-  const wrap = document.getElementById("photoPreviewWrap");
-  const img = document.getElementById("photoPreview");
+/* Bepalen of media video is */
 
-  const primary = normalizeMediaPath(primaryPath);
-  const fallback = normalizeMediaPath(fallbackPath);
+function isVideoPath(path) {
+  return (
+    /\.(mov|mp4|m4v|webm)$/i
+      .test(path || "")
+  );
+}
 
-  if (!primary && !fallback) {
-    clearMediaPreview();
+
+/*
+  Laat foto of video zien.
+
+  Als video niet geladen kan worden:
+  -> probeer fallback-foto.
+
+  Als ook foto niet werkt:
+  -> geen media.
+*/
+
+function showMediaPreview(
+  primaryPath,
+  fallbackPath = null
+) {
+  const primary =
+    normalizeMediaPath(
+      primaryPath
+    );
+
+  const fallback =
+    normalizeMediaPath(
+      fallbackPath
+    );
+
+  clearMediaPreview();
+
+  if (
+    !primary &&
+    !fallback
+  ) {
     return;
   }
 
-  let triedFallback = false;
+  showSingleMediaPreview(
+    primary || fallback,
+    primary
+      ? fallback
+      : null
+  );
+}
 
-  img.onload = () => {
-    wrap.classList.remove("hidden");
-  };
 
-  img.onerror = () => {
-    if (!triedFallback && fallback && img.src !== new URL(fallback, window.location.href).href) {
-      triedFallback = true;
-      img.src = fallback;
-      return;
-    }
+function showSingleMediaPreview(
+  path,
+  fallbackPath = null
+) {
+  const photoWrap =
+    document.getElementById(
+      "photoPreviewWrap"
+    );
 
-    clearMediaPreview();
-  };
+  const img =
+    document.getElementById(
+      "photoPreview"
+    );
 
-  img.src = primary || fallback;
-  wrap.classList.remove("hidden");
+  const videoWrap =
+    document.getElementById(
+      "videoPreviewWrap"
+    );
+
+  const video =
+    document.getElementById(
+      "videoPreview"
+    );
+
+  if (isVideoPath(path)) {
+
+    video.onloadeddata =
+      () => {
+        videoWrap.classList.remove(
+          "hidden"
+        );
+      };
+
+    video.onerror =
+      () => {
+        video.onerror = null;
+
+        video.removeAttribute(
+          "src"
+        );
+
+        video.load();
+
+        videoWrap.classList.add(
+          "hidden"
+        );
+
+        if (fallbackPath) {
+          showSingleMediaPreview(
+            fallbackPath,
+            null
+          );
+        }
+      };
+
+    video.src = path;
+
+    videoWrap.classList.remove(
+      "hidden"
+    );
+
+    return;
+  }
+
+  img.onload =
+    () => {
+      photoWrap.classList.remove(
+        "hidden"
+      );
+    };
+
+  img.onerror =
+    () => {
+      img.onload = null;
+      img.onerror = null;
+      img.src = "";
+
+      photoWrap.classList.add(
+        "hidden"
+      );
+
+      if (fallbackPath) {
+        showSingleMediaPreview(
+          fallbackPath,
+          null
+        );
+      }
+    };
+
+  img.src = path;
+
+  photoWrap.classList.remove(
+    "hidden"
+  );
 }
 
 
 function clearMediaPreview() {
-  const wrap = document.getElementById("photoPreviewWrap");
-  const img = document.getElementById("photoPreview");
+  const photoWrap =
+    document.getElementById(
+      "photoPreviewWrap"
+    );
 
-  if (!wrap || !img) {
-    return;
+  const img =
+    document.getElementById(
+      "photoPreview"
+    );
+
+  const videoWrap =
+    document.getElementById(
+      "videoPreviewWrap"
+    );
+
+  const video =
+    document.getElementById(
+      "videoPreview"
+    );
+
+  if (img) {
+    img.onload = null;
+    img.onerror = null;
+    img.src = "";
   }
 
-  img.onload = null;
-  img.onerror = null;
-  img.src = "";
-  wrap.classList.add("hidden");
+  if (photoWrap) {
+    photoWrap.classList.add(
+      "hidden"
+    );
+  }
+
+  if (video) {
+    video.onloadeddata = null;
+    video.onerror = null;
+
+    video.pause();
+
+    video.removeAttribute(
+      "src"
+    );
+
+    video.load();
+  }
+
+  if (videoWrap) {
+    videoWrap.classList.add(
+      "hidden"
+    );
+  }
 }
 
 
@@ -1040,55 +1813,201 @@ function clearMediaPreview() {
    DELEN VIA WHATSAPP
 ======================================== */
 
-async function getShareableMediaFile(path) {
-  const normalizedPath = normalizeMediaPath(path);
+/*
+  Haalt foto/video op en maakt er
+  een deelbaar bestand van.
+
+  Ondersteunt:
+  - MOV
+  - MP4
+  - M4V
+  - WEBM
+  - PNG
+  - JPG/JPEG
+  - GIF
+  - WEBP
+*/
+
+async function getShareableMediaFile(
+  path
+) {
+  const normalizedPath =
+    normalizeMediaPath(path);
 
   if (!normalizedPath) {
     return null;
   }
 
   try {
-    const response = await fetch(normalizedPath, { cache: "no-store" });
+    const response =
+      await fetch(
+        normalizedPath,
+        {
+          cache: "no-store"
+        }
+      );
 
     if (!response.ok) {
       return null;
     }
 
-    const blob = await response.blob();
+    const blob =
+      await response.blob();
 
-    if (!blob.type || !blob.type.startsWith("image/")) {
+    const filename =
+      normalizedPath
+        .split("/")
+        .pop() ||
+      "media";
+
+    const extension =
+      filename
+        .split(".")
+        .pop()
+        .toLowerCase();
+
+    const mimeByExtension = {
+      mov:
+        "video/quicktime",
+
+      mp4:
+        "video/mp4",
+
+      m4v:
+        "video/x-m4v",
+
+      webm:
+        "video/webm",
+
+      png:
+        "image/png",
+
+      jpg:
+        "image/jpeg",
+
+      jpeg:
+        "image/jpeg",
+
+      gif:
+        "image/gif",
+
+      webp:
+        "image/webp"
+    };
+
+    let mediaType =
+      blob.type;
+
+    /*
+      GitHub Pages/browser kan MOV
+      soms als application/octet-stream
+      teruggeven.
+
+      Daarom bepalen we bij twijfel
+      het type aan de extensie.
+    */
+
+    if (
+      !mediaType ||
+      mediaType ===
+        "application/octet-stream" ||
+      (
+        !mediaType.startsWith(
+          "image/"
+        ) &&
+        !mediaType.startsWith(
+          "video/"
+        )
+      )
+    ) {
+      mediaType =
+        mimeByExtension[
+          extension
+        ] || "";
+    }
+
+    if (
+      !mediaType.startsWith(
+        "image/"
+      ) &&
+      !mediaType.startsWith(
+        "video/"
+      )
+    ) {
       return null;
     }
 
-    const filename = normalizedPath.split("/").pop() || "media";
+    return new File(
+      [blob],
+      filename,
+      {
+        type: mediaType
+      }
+    );
 
-    return new File([blob], filename, {
-      type: blob.type
-    });
   } catch (error) {
-    console.warn("Media kon niet worden geladen:", normalizedPath, error);
+    console.warn(
+      "Media kon niet worden geladen:",
+      normalizedPath,
+      error
+    );
+
     return null;
   }
 }
 
 
+/*
+  DELEN
+
+  1. Probeer gewenste media.
+  2. Lukt dat niet, probeer fallback-foto.
+  3. Kan media niet gedeeld worden,
+     deel alleen tekst.
+  4. Als Web Share niet bestaat,
+     kopieer tekst.
+*/
+
 async function shareWhatsApp() {
   if (!currentMessage) {
-    alert("Maak eerst een bericht.");
+    alert(
+      "Maak eerst een bericht."
+    );
+
     return;
   }
 
   try {
-    let file = await getShareableMediaFile(currentPhotoPath);
+    let file =
+      await getShareableMediaFile(
+        currentMediaPath
+      );
 
-    if (!file && currentFallbackMediaPath) {
-      file = await getShareableMediaFile(currentFallbackMediaPath);
+    /*
+      Als bijvoorbeeld de video niet
+      beschikbaar is, probeer foto.
+    */
+
+    if (
+      !file &&
+      currentFallbackMediaPath
+    ) {
+      file =
+        await getShareableMediaFile(
+          currentFallbackMediaPath
+        );
     }
+
+    /*
+      Probeer tekst + media.
+    */
 
     if (
       file &&
       navigator.canShare &&
-      navigator.canShare({ files: [file] }) &&
+      navigator.canShare({
+        files: [file]
+      }) &&
       navigator.share
     ) {
       await navigator.share({
@@ -1099,6 +2018,11 @@ async function shareWhatsApp() {
       return;
     }
 
+    /*
+      Media kan niet gedeeld worden.
+      Bericht zelf moet altijd door kunnen.
+    */
+
     if (navigator.share) {
       await navigator.share({
         text: currentMessage
@@ -1107,22 +2031,53 @@ async function shareWhatsApp() {
       return;
     }
 
-    await navigator.clipboard.writeText(currentMessage);
+    /*
+      Laatste fallback:
+      tekst naar klembord.
+    */
 
-    alert("Bericht gekopieerd. Open WhatsApp en plak het bericht handmatig.");
+    await navigator.clipboard.writeText(
+      currentMessage
+    );
+
+    alert(
+      "Bericht gekopieerd. Open WhatsApp en plak het bericht handmatig."
+    );
+
   } catch (error) {
-    if (error && error.name === "AbortError") {
+    /*
+      Gebruiker heeft zelf het
+      deelvenster gesloten.
+    */
+
+    if (
+      error &&
+      error.name === "AbortError"
+    ) {
       return;
     }
 
     console.error(error);
 
     try {
-      await navigator.clipboard.writeText(currentMessage);
-      alert("Delen lukte niet. Het bericht is gekopieerd.");
-    } catch (clipboardError) {
-      console.error(clipboardError);
-      alert("Delen lukte niet. Kopieer het bericht handmatig uit de preview.");
+      await navigator.clipboard.writeText(
+        currentMessage
+      );
+
+      alert(
+        "Delen lukte niet. Het bericht is gekopieerd."
+      );
+
+    } catch (
+      clipboardError
+    ) {
+      console.error(
+        clipboardError
+      );
+
+      alert(
+        "Delen lukte niet. Kopieer het bericht handmatig uit de preview."
+      );
     }
   }
 }
@@ -1133,14 +2088,25 @@ async function shareWhatsApp() {
 ======================================== */
 
 function updateClock() {
-  const currentDateElement = document.getElementById("currentDate");
-  const currentClockElement = document.getElementById("currentClock");
+  const currentDateElement =
+    document.getElementById(
+      "currentDate"
+    );
 
-  if (!currentDateElement || !currentClockElement) {
+  const currentClockElement =
+    document.getElementById(
+      "currentClock"
+    );
+
+  if (
+    !currentDateElement ||
+    !currentClockElement
+  ) {
     return;
   }
 
-  const now = new Date();
+  const now =
+    new Date();
 
   const dateOptions = {
     weekday: "long",
@@ -1149,10 +2115,23 @@ function updateClock() {
     year: "numeric"
   };
 
-  let dateString = now.toLocaleDateString("nl-NL", dateOptions);
+  let dateString =
+    now.toLocaleDateString(
+      "nl-NL",
+      dateOptions
+    );
 
-  dateString = dateString.charAt(0).toUpperCase() + dateString.slice(1);
+  dateString =
+    dateString
+      .charAt(0)
+      .toUpperCase() +
+    dateString.slice(1);
 
-  currentDateElement.textContent = dateString;
-  currentClockElement.textContent = now.toLocaleTimeString("nl-NL");
+  currentDateElement.textContent =
+    dateString;
+
+  currentClockElement.textContent =
+    now.toLocaleTimeString(
+      "nl-NL"
+    );
 }

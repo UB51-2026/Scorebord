@@ -165,8 +165,23 @@
       >
         <img
           id="photoPreview"
-          alt="Media preview"
+          alt="Spelersfoto preview"
         />
+      </div>
+
+      <div
+        id="videoPreviewWrap"
+        class="photo-wrap hidden"
+      >
+        <video
+          id="videoPreview"
+          controls
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          style="max-width: 100%; height: auto;"
+        ></video>
       </div>
 
       <button
@@ -238,37 +253,7 @@
         </button>
       </div>
     </dialog>
-
-
-    <dialog id="endMatchDialog">
-      <h3>Wedstrijd afgelopen</h3>
-
-      <p>
-        Het eindbericht staat klaar. Deel het bericht of sluit de wedstrijd af en reset de app.
-      </p>
-
-      <div class="buttons">
-        <button
-          class="share"
-          onclick="shareEndMessage()"
-        >
-          📤 Eindbericht delen
-        </button>
-
-        <button
-          class="goal"
-          onclick="finishAndResetMatch()"
-        >
-          ✅ Wedstrijd afsluiten en resetten
-        </button>
-
-        <button onclick="closeEndMatchDialog()">
-          Later
-        </button>
-      </div>
-    </dialog>
-
-  </main>
+</main>
 
   <script src="script.js"></script>
 </body>
