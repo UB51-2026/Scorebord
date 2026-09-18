@@ -21,6 +21,10 @@ let ownGoals = [];
 let nextGoalId = 1;
 
 
+/* ========================================
+   OPSTARTEN
+======================================== */
+
 document.addEventListener("DOMContentLoaded", async () => {
   await loadData();
 
@@ -47,11 +51,27 @@ document.addEventListener("DOMContentLoaded", async () => {
 ======================================== */
 
 async function loadData() {
-  const teamsResponse = await fetch("data/teams.json");
-  teams = await teamsResponse.json();
+  try {
+    const teamsResponse = await fetch("data/teams.json");
 
-  const playersResponse = await fetch("data/players.json");
-  players = await playersResponse.json();
+    if (!teamsResponse.ok) {
+      throw new Error("teams.json kon niet worden geladen.");
+    }
+
+    teams = await teamsResponse.json();
+
+    const playersResponse = await fetch("data/players.json");
+
+    if (!playersResponse.ok) {
+      throw new Error("players.json kon niet worden geladen.");
+    }
+
+    players = await playersResponse.json();
+
+  } catch (error) {
+    console.error("Fout bij laden data:", error);
+    alert("De team- of spelersgegevens konden niet worden geladen.");
+  }
 }
 
 
@@ -95,8 +115,7 @@ function saveMatchState() {
 
 
 function restoreMatchState() {
-  const raw =
-    localStorage.getItem(STORAGE_KEY);
+  const raw = localStorage.getItem(STORAGE_KEY);
 
   if (!raw) {
     return;
@@ -105,23 +124,15 @@ function restoreMatchState() {
   try {
     const state = JSON.parse(raw);
 
-    if (
-      !state ||
-      typeof state !== "object"
-    ) {
+    if (!state || typeof state !== "object") {
       return;
     }
 
     const matchTypeSelect =
       document.getElementById("matchType");
 
-    if (
-      state.matchType &&
-      matchTypeSelect
-    ) {
-      matchTypeSelect.value =
-        state.matchType;
-
+    if (state.matchType && matchTypeSelect) {
+      matchTypeSelect.value = state.matchType;
       fillTeamDropdowns();
     }
 
@@ -131,20 +142,12 @@ function restoreMatchState() {
     const teamBSelect =
       document.getElementById("teamB");
 
-    if (
-      state.teamA &&
-      teamASelect
-    ) {
-      teamASelect.value =
-        state.teamA;
+    if (state.teamA && teamASelect) {
+      teamASelect.value = state.teamA;
     }
 
-    if (
-      state.teamB &&
-      teamBSelect
-    ) {
-      teamBSelect.value =
-        state.teamB;
+    if (state.teamB && teamBSelect) {
+      teamBSelect.value = state.teamB;
     }
 
     preventSameTeams("teamA");
@@ -160,16 +163,13 @@ function restoreMatchState() {
         : 0;
 
     matchStatus =
-      state.matchStatus ||
-      "not_started";
+      state.matchStatus || "not_started";
 
     firstHalfStartedAt =
-      state.firstHalfStartedAt ||
-      null;
+      state.firstHalfStartedAt || null;
 
     secondHalfStartedAt =
-      state.secondHalfStartedAt ||
-      null;
+      state.secondHalfStartedAt || null;
 
     pausedMinute =
       Number.isFinite(state.pausedMinute)
@@ -177,22 +177,22 @@ function restoreMatchState() {
         : 0;
 
     currentMessage =
-      state.currentMessage ||
-      "";
+      state.currentMessage || "";
 
-    // Compatibel met oude opslag waarin currentPhotoPath werd gebruikt.
+    /*
+      Ondersteunt ook wedstrijden die nog
+      met de oude currentPhotoPath zijn opgeslagen.
+    */
     currentMediaPath =
       state.currentMediaPath ||
       state.currentPhotoPath ||
       null;
 
     currentFallbackMediaPath =
-      state.currentFallbackMediaPath ||
-      null;
+      state.currentFallbackMediaPath || null;
 
     lastGoal =
-      state.lastGoal ||
-      null;
+      state.lastGoal || null;
 
     ownGoals =
       Array.isArray(state.ownGoals)
@@ -216,9 +216,7 @@ function restoreMatchState() {
 
 
 function clearMatchState() {
-  localStorage.removeItem(
-    STORAGE_KEY
-  );
+  localStorage.removeItem(STORAGE_KEY);
 }
 
 
@@ -247,47 +245,34 @@ function fillTeamDropdowns() {
   const filteredTeams =
     teams.filter(team =>
       team.types &&
-      team.types.includes(
-        selectedType
-      )
+      team.types.includes(selectedType)
     );
 
   filteredTeams.forEach(team => {
     teamA.add(
-      new Option(
-        team.naam,
-        team.id
-      )
+      new Option(team.naam, team.id)
     );
 
     teamB.add(
-      new Option(
-        team.naam,
-        team.id
-      )
+      new Option(team.naam, team.id)
     );
   });
 
   const ownIndex =
     filteredTeams.findIndex(
-      team =>
-        team.id === ownClubId
+      team => team.id === ownClubId
     );
 
   if (ownIndex >= 0) {
-    teamA.selectedIndex =
-      ownIndex;
+    teamA.selectedIndex = ownIndex;
   }
 
   const firstOpponentIndex =
     filteredTeams.findIndex(
-      team =>
-        team.id !== ownClubId
+      team => team.id !== ownClubId
     );
 
-  if (
-    firstOpponentIndex >= 0
-  ) {
+  if (firstOpponentIndex >= 0) {
     teamB.selectedIndex =
       firstOpponentIndex;
   }
@@ -316,9 +301,7 @@ function fillTeamDropdowns() {
 }
 
 
-function preventSameTeams(
-  changedSelectId
-) {
+function preventSameTeams(changedSelectId) {
   const teamA =
     document.getElementById("teamA");
 
@@ -329,17 +312,12 @@ function preventSameTeams(
     return;
   }
 
-  if (
-    teamA.value !==
-    teamB.value
-  ) {
+  if (teamA.value !== teamB.value) {
     return;
   }
 
   const changedSelect =
-    document.getElementById(
-      changedSelectId
-    );
+    document.getElementById(changedSelectId);
 
   const otherSelect =
     changedSelectId === "teamA"
@@ -377,19 +355,14 @@ function updateTeamNames() {
 
 function getTeamName(selectId) {
   const teamId =
-    document.getElementById(
-      selectId
-    )?.value;
+    document.getElementById(selectId)?.value;
 
   const team =
     teams.find(
-      team =>
-        team.id === teamId
+      team => team.id === teamId
     );
 
-  return team
-    ? team.naam
-    : "";
+  return team ? team.naam : "";
 }
 
 
@@ -401,8 +374,7 @@ function loadOwnClubPlayers() {
   const ownClubPlayers =
     players.filter(
       player =>
-        player.teamId ===
-        ownClubId
+        player.teamId === ownClubId
     );
 
   fillGoalScorerSelect(
@@ -432,29 +404,22 @@ function fillGoalScorerSelect(
   playerList
 ) {
   const select =
-    document.getElementById(
-      elementId
-    );
+    document.getElementById(elementId);
 
   select.innerHTML = "";
 
   select.add(
-    new Option(
-      "Onbekend",
-      ""
-    )
+    new Option("Onbekend", "")
   );
 
-  playerList.forEach(
-    player => {
-      select.add(
-        new Option(
-          player.naam,
-          player.id
-        )
-      );
-    }
-  );
+  playerList.forEach(player => {
+    select.add(
+      new Option(
+        player.naam,
+        player.id
+      )
+    );
+  });
 
   select.value = "";
 }
@@ -465,32 +430,24 @@ function fillPlayerSelect(
   playerList
 ) {
   const select =
-    document.getElementById(
-      elementId
-    );
+    document.getElementById(elementId);
 
   select.innerHTML = "";
 
-  playerList.forEach(
-    player => {
-      select.add(
-        new Option(
-          player.naam,
-          player.id
-        )
-      );
-    }
-  );
+  playerList.forEach(player => {
+    select.add(
+      new Option(
+        player.naam,
+        player.id
+      )
+    );
+  });
 }
 
 
-function getSelectedPlayer(
-  selectId
-) {
+function getSelectedPlayer(selectId) {
   const playerId =
-    document.getElementById(
-      selectId
-    ).value;
+    document.getElementById(selectId).value;
 
   if (!playerId) {
     return null;
@@ -498,8 +455,7 @@ function getSelectedPlayer(
 
   return (
     players.find(
-      player =>
-        player.id === playerId
+      player => player.id === playerId
     ) || null
   );
 }
@@ -507,9 +463,7 @@ function getSelectedPlayer(
 
 function resetGoalScorerSelect() {
   const select =
-    document.getElementById(
-      "playerSelect"
-    );
+    document.getElementById("playerSelect");
 
   if (select) {
     select.value = "";
@@ -534,20 +488,13 @@ function startMatch() {
 
   updateScore();
 
-  firstHalfStartedAt =
-    Date.now();
-
-  secondHalfStartedAt =
-    null;
-
+  firstHalfStartedAt = Date.now();
+  secondHalfStartedAt = null;
   pausedMinute = 0;
 
-  matchStatus =
-    "first_half";
+  matchStatus = "first_half";
 
-  setStatus(
-    "1e helft loopt"
-  );
+  setStatus("1e helft loopt");
 
   createMessage(
 `⚽ De wedstrijd tussen ${getTeamName("teamA")} - ${getTeamName("teamB")} is gestart! 🔥
@@ -594,9 +541,7 @@ function startSecondHalf() {
   matchStatus =
     "second_half";
 
-  setStatus(
-    "2e helft loopt"
-  );
+  setStatus("2e helft loopt");
 
   createMessage(
 `⚽ We zijn begonnen met de tweede helft! 🔥
@@ -616,8 +561,7 @@ function endMatch() {
   pausedMinute =
     getCurrentMinute();
 
-  matchStatus =
-    "ended";
+  matchStatus = "ended";
 
   setStatus("Afgelopen");
 
@@ -649,19 +593,13 @@ function registerOwnGoal(
     id: nextGoalId++,
     minute,
     minuteText:
-      formatMatchMinute(
-        minute
-      ),
+      formatMatchMinute(minute),
     scoreA,
     scoreB,
     playerId:
-      player
-        ? player.id
-        : null,
+      player ? player.id : null,
     playerName:
-      player
-        ? player.naam
-        : null
+      player ? player.naam : null
   };
 
   ownGoals.push(goal);
@@ -674,9 +612,7 @@ function registerOwnGoal(
 
 function getOwnScore() {
   const teamAId =
-    document.getElementById(
-      "teamA"
-    ).value;
+    document.getElementById("teamA").value;
 
   return (
     teamAId === ownClubId
@@ -688,9 +624,7 @@ function getOwnScore() {
 
 function getOpponentScore() {
   const teamAId =
-    document.getElementById(
-      "teamA"
-    ).value;
+    document.getElementById("teamA").value;
 
   return (
     teamAId === ownClubId
@@ -700,25 +634,23 @@ function getOpponentScore() {
 }
 
 
-/*
-  MEDIAREGEL:
+/* ========================================
+   MEDIAREGEL BIJ GOAL
 
-  UB staat NA het doelpunt nog achter:
-  -> normale spelersfoto
+   NA goal nog achter:
+   -> foto
 
-  UB staat NA het doelpunt gelijk of voor:
-  -> video
+   NA goal gelijk of voor:
+   -> video
 
-  Video ontbreekt:
-  -> foto
+   Video ontbreekt:
+   -> foto
 
-  Foto ontbreekt:
-  -> alleen tekst
-*/
+   Foto ontbreekt:
+   -> alleen tekst
+======================================== */
 
-function getGoalMediaForPlayer(
-  player
-) {
+function getGoalMediaForPlayer(player) {
   if (!player) {
     return {
       primary: null,
@@ -732,36 +664,26 @@ function getGoalMediaForPlayer(
   const opponentScore =
     getOpponentScore();
 
-  if (
-    ownScore >= opponentScore
-  ) {
+  if (ownScore >= opponentScore) {
     return {
       primary:
-        normalizeMediaPath(
-          player.video
-        ),
+        normalizeMediaPath(player.video),
 
       fallback:
-        normalizeMediaPath(
-          player.foto
-        )
+        normalizeMediaPath(player.foto)
     };
   }
 
   return {
     primary:
-      normalizeMediaPath(
-        player.foto
-      ),
+      normalizeMediaPath(player.foto),
 
     fallback: null
   };
 }
 
 
-function normalizeMediaPath(
-  value
-) {
+function normalizeMediaPath(value) {
   if (
     !value ||
     value === "null" ||
@@ -780,30 +702,20 @@ function normalizeMediaPath(
 
 function goalTeamA() {
   const teamAId =
-    document.getElementById(
-      "teamA"
-    ).value;
+    document.getElementById("teamA").value;
 
   const minute =
     getCurrentMinute();
 
   lastGoal = {
-    previousScoreA:
-      scoreA,
-
-    previousScoreB:
-      scoreB,
-
+    previousScoreA: scoreA,
+    previousScoreB: scoreB,
     ownGoalId: null
   };
 
-  if (
-    teamAId === ownClubId
-  ) {
+  if (teamAId === ownClubId) {
     const player =
-      getSelectedPlayer(
-        "playerSelect"
-      );
+      getSelectedPlayer("playerSelect");
 
     scoreA++;
 
@@ -820,9 +732,7 @@ function goalTeamA() {
 
     if (player) {
       const media =
-        getGoalMediaForPlayer(
-          player
-        );
+        getGoalMediaForPlayer(player);
 
       createMessage(
 `⚽🔥 GOOOAAALLL ULFTSE BOYS!!!
@@ -869,30 +779,20 @@ ${formatMatchMinute(minute)} | ${getTeamName("teamA")} - ${getTeamName("teamB")}
 
 function goalTeamB() {
   const teamBId =
-    document.getElementById(
-      "teamB"
-    ).value;
+    document.getElementById("teamB").value;
 
   const minute =
     getCurrentMinute();
 
   lastGoal = {
-    previousScoreA:
-      scoreA,
-
-    previousScoreB:
-      scoreB,
-
+    previousScoreA: scoreA,
+    previousScoreB: scoreB,
     ownGoalId: null
   };
 
-  if (
-    teamBId === ownClubId
-  ) {
+  if (teamBId === ownClubId) {
     const player =
-      getSelectedPlayer(
-        "playerSelect"
-      );
+      getSelectedPlayer("playerSelect");
 
     scoreB++;
 
@@ -909,9 +809,7 @@ function goalTeamB() {
 
     if (player) {
       const media =
-        getGoalMediaForPlayer(
-          player
-        );
+        getGoalMediaForPlayer(player);
 
       createMessage(
 `⚽🔥 GOOOAAALLL ULFTSE BOYS!!!
@@ -958,8 +856,7 @@ ${formatMatchMinute(minute)} | ${getTeamName("teamA")} - ${getTeamName("teamB")}
 
 function getUnknownGoals() {
   return ownGoals.filter(
-    goal =>
-      !goal.playerId
+    goal => !goal.playerId
   );
 }
 
@@ -975,36 +872,22 @@ function updateUnknownGoalReminder() {
       "unknownGoalReminderText"
     );
 
-  if (
-    !reminder ||
-    !reminderText
-  ) {
+  if (!reminder || !reminderText) {
     return;
   }
 
   const unknownGoals =
     getUnknownGoals();
 
-  if (
-    unknownGoals.length === 0
-  ) {
-    reminder.classList.add(
-      "hidden"
-    );
-
-    reminderText.textContent =
-      "";
-
+  if (unknownGoals.length === 0) {
+    reminder.classList.add("hidden");
+    reminderText.textContent = "";
     return;
   }
 
-  reminder.classList.remove(
-    "hidden"
-  );
+  reminder.classList.remove("hidden");
 
-  if (
-    unknownGoals.length === 1
-  ) {
+  if (unknownGoals.length === 1) {
     reminderText.textContent =
       "1 doelpunt zonder doelpuntenmaker";
   } else {
@@ -1022,9 +905,7 @@ function openAssignGoalDialog() {
   const unknownGoals =
     getUnknownGoals();
 
-  if (
-    unknownGoals.length === 0
-  ) {
+  if (unknownGoals.length === 0) {
     alert(
       "Er zijn geen doelpunten zonder doelpuntenmaker."
     );
@@ -1039,19 +920,17 @@ function openAssignGoalDialog() {
 
   goalSelect.innerHTML = "";
 
-  unknownGoals.forEach(
-    goal => {
-      const label =
-        `${goal.minuteText} | ${goal.scoreA}-${goal.scoreB} | Onbekend`;
+  unknownGoals.forEach(goal => {
+    const label =
+      `${goal.minuteText} | ${goal.scoreA}-${goal.scoreB} | Onbekend`;
 
-      goalSelect.add(
-        new Option(
-          label,
-          goal.id
-        )
-      );
-    }
-  );
+    goalSelect.add(
+      new Option(
+        label,
+        goal.id
+      )
+    );
+  });
 
   const playerSelect =
     document.getElementById(
@@ -1062,8 +941,7 @@ function openAssignGoalDialog() {
     playerSelect &&
     playerSelect.options.length > 0
   ) {
-    playerSelect.selectedIndex =
-      0;
+    playerSelect.selectedIndex = 0;
   }
 
   document.getElementById(
@@ -1093,25 +971,18 @@ function assignGoalScorer() {
     );
 
   if (!goalId) {
-    alert(
-      "Kies eerst een doelpunt."
-    );
-
+    alert("Kies eerst een doelpunt.");
     return;
   }
 
   if (!player) {
-    alert(
-      "Kies eerst een speler."
-    );
-
+    alert("Kies eerst een speler.");
     return;
   }
 
   const goal =
     ownGoals.find(
-      goal =>
-        goal.id === goalId
+      goal => goal.id === goalId
     );
 
   if (!goal) {
@@ -1184,9 +1055,7 @@ function undoLastGoal(reason) {
 
   updateScore();
 
-  if (
-    lastGoal.ownGoalId
-  ) {
+  if (lastGoal.ownGoalId) {
     ownGoals =
       ownGoals.filter(
         goal =>
@@ -1201,9 +1070,7 @@ function undoLastGoal(reason) {
 
   closeUndoGoalDialog();
 
-  if (
-    reason === "disallowed"
-  ) {
+  if (reason === "disallowed") {
     createMessage(
 `❌ Doelpunt afgekeurd
 
@@ -1216,16 +1083,10 @@ ${getTeamName("teamA")} - ${getTeamName("teamB")} | ${scoreA}-${scoreB}`
     return;
   }
 
-  if (
-    reason === "mistake"
-  ) {
+  if (reason === "mistake") {
     currentMessage = "";
-
-    currentMediaPath =
-      null;
-
-    currentFallbackMediaPath =
-      null;
+    currentMediaPath = null;
+    currentFallbackMediaPath = null;
 
     document.getElementById(
       "messagePreview"
@@ -1245,19 +1106,12 @@ ${getTeamName("teamA")} - ${getTeamName("teamB")} | ${scoreA}-${scoreB}`
 
 function substitution() {
   const outPlayer =
-    getSelectedPlayer(
-      "playerOut"
-    );
+    getSelectedPlayer("playerOut");
 
   const inPlayer =
-    getSelectedPlayer(
-      "playerIn"
-    );
+    getSelectedPlayer("playerIn");
 
-  if (
-    !outPlayer ||
-    !inPlayer
-  ) {
+  if (!outPlayer || !inPlayer) {
     alert(
       "Kies speler eruit en speler erin."
     );
@@ -1265,10 +1119,7 @@ function substitution() {
     return;
   }
 
-  if (
-    outPlayer.id ===
-    inPlayer.id
-  ) {
+  if (outPlayer.id === inPlayer.id) {
     alert(
       "Speler eruit en erin mogen niet dezelfde speler zijn."
     );
@@ -1294,9 +1145,7 @@ Eruit: ${outPlayer.naam} ⬅️`
    RESET WEDSTRIJD
 ======================================== */
 
-function resetMatch(
-  skipConfirm = false
-) {
+function resetMatch(skipConfirm = false) {
   if (!skipConfirm) {
     const confirmed =
       confirm(
@@ -1314,30 +1163,19 @@ function resetMatch(
   matchStatus =
     "not_started";
 
-  firstHalfStartedAt =
-    null;
-
-  secondHalfStartedAt =
-    null;
-
+  firstHalfStartedAt = null;
+  secondHalfStartedAt = null;
   pausedMinute = 0;
 
   currentMessage = "";
-
-  currentMediaPath =
-    null;
-
-  currentFallbackMediaPath =
-    null;
+  currentMediaPath = null;
+  currentFallbackMediaPath = null;
 
   lastGoal = null;
-
   ownGoals = [];
-
   nextGoalId = 1;
 
   resetGoalScorerSelect();
-
   updateUnknownGoalReminder();
 
   updateScore();
@@ -1348,8 +1186,7 @@ function resetMatch(
 
   document.getElementById(
     "minute"
-  ).textContent =
-    "0'";
+  ).textContent = "0'";
 
   document.getElementById(
     "messagePreview"
@@ -1369,21 +1206,18 @@ function resetMatch(
 function updateScore() {
   document.getElementById(
     "scoreA"
-  ).textContent =
-    scoreA;
+  ).textContent = scoreA;
 
   document.getElementById(
     "scoreB"
-  ).textContent =
-    scoreB;
+  ).textContent = scoreB;
 }
 
 
 function setStatus(text) {
   document.getElementById(
     "status"
-  ).textContent =
-    text;
+  ).textContent = text;
 }
 
 
@@ -1417,15 +1251,14 @@ function updateStatusFromMatchState() {
 ======================================== */
 
 function startTimerDisplay() {
-  const updateMinuteDisplay =
-    () => {
-      document.getElementById(
-        "minute"
-      ).textContent =
-        formatMatchMinute(
-          getCurrentMinute()
-        );
-    };
+  const updateMinuteDisplay = () => {
+    document.getElementById(
+      "minute"
+    ).textContent =
+      formatMatchMinute(
+        getCurrentMinute()
+      );
+  };
 
   updateMinuteDisplay();
 
@@ -1437,10 +1270,7 @@ function startTimerDisplay() {
 
 
 function getCurrentRawMinute() {
-  if (
-    matchStatus ===
-    "not_started"
-  ) {
+  if (matchStatus === "not_started") {
     return 0;
   }
 
@@ -1451,16 +1281,9 @@ function getCurrentRawMinute() {
     return pausedMinute;
   }
 
-  if (
-    matchStatus ===
-    "first_half"
-  ) {
-    if (
-      !firstHalfStartedAt
-    ) {
-      return (
-        pausedMinute || 0
-      );
+  if (matchStatus === "first_half") {
+    if (!firstHalfStartedAt) {
+      return pausedMinute || 0;
     }
 
     const diff =
@@ -1469,22 +1292,13 @@ function getCurrentRawMinute() {
 
     return Math.max(
       1,
-      Math.ceil(
-        diff / 60000
-      )
+      Math.ceil(diff / 60000)
     );
   }
 
-  if (
-    matchStatus ===
-    "second_half"
-  ) {
-    if (
-      !secondHalfStartedAt
-    ) {
-      return (
-        pausedMinute || 45
-      );
+  if (matchStatus === "second_half") {
+    if (!secondHalfStartedAt) {
+      return pausedMinute || 45;
     }
 
     const diff =
@@ -1495,9 +1309,7 @@ function getCurrentRawMinute() {
       45 +
       Math.max(
         1,
-        Math.ceil(
-          diff / 60000
-        )
+        Math.ceil(diff / 60000)
       )
     );
   }
@@ -1511,39 +1323,29 @@ function getCurrentMinute() {
 }
 
 
-function formatMatchMinute(
-  minute
-) {
+function formatMatchMinute(minute) {
   if (minute === 0) {
     return "0'";
   }
 
   if (
     (
-      matchStatus ===
-        "first_half" ||
-      matchStatus ===
-        "half_time"
+      matchStatus === "first_half" ||
+      matchStatus === "half_time"
     ) &&
     minute > 45
   ) {
-    return (
-      `45+${minute - 45}'`
-    );
+    return `45+${minute - 45}'`;
   }
 
   if (
     (
-      matchStatus ===
-        "second_half" ||
-      matchStatus ===
-        "ended"
+      matchStatus === "second_half" ||
+      matchStatus === "ended"
     ) &&
     minute > 90
   ) {
-    return (
-      `90+${minute - 90}'`
-    );
+    return `90+${minute - 90}'`;
   }
 
   return `${minute}'`;
@@ -1562,9 +1364,7 @@ function createMessage(
   currentMessage = text;
 
   currentMediaPath =
-    normalizeMediaPath(
-      mediaPath
-    );
+    normalizeMediaPath(mediaPath);
 
   currentFallbackMediaPath =
     normalizeMediaPath(
@@ -1573,8 +1373,7 @@ function createMessage(
 
   document.getElementById(
     "messagePreview"
-  ).textContent =
-    text;
+  ).textContent = text;
 
   showMediaPreview(
     currentMediaPath,
@@ -1606,54 +1405,31 @@ function restoreMessagePreview() {
 }
 
 
-/* Bepalen of media video is */
-
 function isVideoPath(path) {
-  return (
-    /\.(mov|mp4|m4v|webm)$/i
-      .test(path || "")
-  );
+  return /\.(mov|mp4|m4v|webm)$/i
+    .test(path || "");
 }
 
-
-/*
-  Laat foto of video zien.
-
-  Als video niet geladen kan worden:
-  -> probeer fallback-foto.
-
-  Als ook foto niet werkt:
-  -> geen media.
-*/
 
 function showMediaPreview(
   primaryPath,
   fallbackPath = null
 ) {
   const primary =
-    normalizeMediaPath(
-      primaryPath
-    );
+    normalizeMediaPath(primaryPath);
 
   const fallback =
-    normalizeMediaPath(
-      fallbackPath
-    );
+    normalizeMediaPath(fallbackPath);
 
   clearMediaPreview();
 
-  if (
-    !primary &&
-    !fallback
-  ) {
+  if (!primary && !fallback) {
     return;
   }
 
   showSingleMediaPreview(
     primary || fallback,
-    primary
-      ? fallback
-      : null
+    primary ? fallback : null
   );
 }
 
@@ -1683,59 +1459,39 @@ function showSingleMediaPreview(
     );
 
   if (isVideoPath(path)) {
+    if (!video || !videoWrap) {
+      console.warn(
+        "Video preview-element ontbreekt in index.html."
+      );
 
-    video.onloadeddata =
-      () => {
-        videoWrap.classList.remove(
-          "hidden"
+      if (fallbackPath) {
+        showSingleMediaPreview(
+          fallbackPath,
+          null
         );
-      };
+      }
 
-    video.onerror =
-      () => {
-        video.onerror = null;
+      return;
+    }
 
-        video.removeAttribute(
-          "src"
-        );
-
-        video.load();
-
-        videoWrap.classList.add(
-          "hidden"
-        );
-
-        if (fallbackPath) {
-          showSingleMediaPreview(
-            fallbackPath,
-            null
-          );
-        }
-      };
-
-    video.src = path;
-
-    videoWrap.classList.remove(
-      "hidden"
-    );
-
-    return;
-  }
-
-  img.onload =
-    () => {
-      photoWrap.classList.remove(
+    video.onloadeddata = () => {
+      videoWrap.classList.remove(
         "hidden"
       );
     };
 
-  img.onerror =
-    () => {
-      img.onload = null;
-      img.onerror = null;
-      img.src = "";
+    video.onerror = () => {
+      console.warn(
+        "Videopreview kon niet worden geladen:",
+        path
+      );
 
-      photoWrap.classList.add(
+      video.onerror = null;
+
+      video.removeAttribute("src");
+      video.load();
+
+      videoWrap.classList.add(
         "hidden"
       );
 
@@ -1746,6 +1502,47 @@ function showSingleMediaPreview(
         );
       }
     };
+
+    video.src = path;
+
+    videoWrap.classList.remove(
+      "hidden"
+    );
+
+    return;
+  }
+
+  if (!img || !photoWrap) {
+    return;
+  }
+
+  img.onload = () => {
+    photoWrap.classList.remove(
+      "hidden"
+    );
+  };
+
+  img.onerror = () => {
+    console.warn(
+      "Fotopreview kon niet worden geladen:",
+      path
+    );
+
+    img.onload = null;
+    img.onerror = null;
+    img.src = "";
+
+    photoWrap.classList.add(
+      "hidden"
+    );
+
+    if (fallbackPath) {
+      showSingleMediaPreview(
+        fallbackPath,
+        null
+      );
+    }
+  };
 
   img.src = path;
 
@@ -1810,27 +1607,10 @@ function clearMediaPreview() {
 
 
 /* ========================================
-   DELEN VIA WHATSAPP
+   MEDIA BESTAND OPHALEN
 ======================================== */
 
-/*
-  Haalt foto/video op en maakt er
-  een deelbaar bestand van.
-
-  Ondersteunt:
-  - MOV
-  - MP4
-  - M4V
-  - WEBM
-  - PNG
-  - JPG/JPEG
-  - GIF
-  - WEBP
-*/
-
-async function getShareableMediaFile(
-  path
-) {
+async function getShareableMediaFile(path) {
   const normalizedPath =
     normalizeMediaPath(path);
 
@@ -1848,6 +1628,12 @@ async function getShareableMediaFile(
       );
 
     if (!response.ok) {
+      console.warn(
+        "Media fetch mislukt:",
+        normalizedPath,
+        response.status
+      );
+
       return null;
     }
 
@@ -1857,8 +1643,7 @@ async function getShareableMediaFile(
     const filename =
       normalizedPath
         .split("/")
-        .pop() ||
-      "media";
+        .pop() || "media";
 
     const extension =
       filename
@@ -1867,86 +1652,72 @@ async function getShareableMediaFile(
         .toLowerCase();
 
     const mimeByExtension = {
-      mov:
-        "video/quicktime",
+      mov: "video/quicktime",
+      mp4: "video/mp4",
+      m4v: "video/x-m4v",
+      webm: "video/webm",
 
-      mp4:
-        "video/mp4",
-
-      m4v:
-        "video/x-m4v",
-
-      webm:
-        "video/webm",
-
-      png:
-        "image/png",
-
-      jpg:
-        "image/jpeg",
-
-      jpeg:
-        "image/jpeg",
-
-      gif:
-        "image/gif",
-
-      webp:
-        "image/webp"
+      png: "image/png",
+      jpg: "image/jpeg",
+      jpeg: "image/jpeg",
+      gif: "image/gif",
+      webp: "image/webp"
     };
 
     let mediaType =
       blob.type;
-
-    /*
-      GitHub Pages/browser kan MOV
-      soms als application/octet-stream
-      teruggeven.
-
-      Daarom bepalen we bij twijfel
-      het type aan de extensie.
-    */
 
     if (
       !mediaType ||
       mediaType ===
         "application/octet-stream" ||
       (
-        !mediaType.startsWith(
-          "image/"
-        ) &&
-        !mediaType.startsWith(
-          "video/"
-        )
+        !mediaType.startsWith("image/") &&
+        !mediaType.startsWith("video/")
       )
     ) {
       mediaType =
-        mimeByExtension[
-          extension
-        ] || "";
+        mimeByExtension[extension] || "";
     }
 
     if (
-      !mediaType.startsWith(
-        "image/"
-      ) &&
-      !mediaType.startsWith(
-        "video/"
-      )
+      !mediaType.startsWith("image/") &&
+      !mediaType.startsWith("video/")
     ) {
+      console.warn(
+        "Onbekend mediatype:",
+        mediaType,
+        normalizedPath
+      );
+
       return null;
     }
 
-    return new File(
-      [blob],
-      filename,
+    const file =
+      new File(
+        [blob],
+        filename,
+        {
+          type: mediaType
+        }
+      );
+
+    console.log(
+      "Media gereed voor delen:",
       {
-        type: mediaType
+        filename:
+          file.name,
+        type:
+          file.type,
+        size:
+          file.size
       }
     );
 
+    return file;
+
   } catch (error) {
-    console.warn(
+    console.error(
       "Media kon niet worden geladen:",
       normalizedPath,
       error
@@ -1957,16 +1728,181 @@ async function getShareableMediaFile(
 }
 
 
-/*
-  DELEN
+/* ========================================
+   CONTROLEREN OF BESTAND DEELBAAR IS
+======================================== */
 
-  1. Probeer gewenste media.
-  2. Lukt dat niet, probeer fallback-foto.
-  3. Kan media niet gedeeld worden,
-     deel alleen tekst.
-  4. Als Web Share niet bestaat,
-     kopieer tekst.
-*/
+function canShareFile(file) {
+  if (
+    !file ||
+    !navigator.share
+  ) {
+    return false;
+  }
+
+  /*
+    Sommige browsers hebben navigator.share
+    maar geen navigator.canShare.
+  */
+
+  if (!navigator.canShare) {
+    return true;
+  }
+
+  try {
+    return navigator.canShare({
+      files: [file]
+    });
+
+  } catch (error) {
+    console.warn(
+      "navigator.canShare gaf een fout:",
+      error
+    );
+
+    return false;
+  }
+}
+
+
+/* ========================================
+   ÉÉN MEDIA-BESTAND PROBEREN TE DELEN
+======================================== */
+
+async function tryShareWithMedia(
+  path,
+  label
+) {
+  const normalizedPath =
+    normalizeMediaPath(path);
+
+  if (!normalizedPath) {
+    return false;
+  }
+
+  const file =
+    await getShareableMediaFile(
+      normalizedPath
+    );
+
+  if (!file) {
+    console.warn(
+      `${label}: bestand kon niet worden gemaakt.`
+    );
+
+    return false;
+  }
+
+  if (!canShareFile(file)) {
+    console.warn(
+      `${label}: browser meldt dat dit bestand niet deelbaar is.`,
+      {
+        name: file.name,
+        type: file.type,
+        size: file.size
+      }
+    );
+
+    return false;
+  }
+
+  try {
+    await navigator.share({
+      text: currentMessage,
+      files: [file]
+    });
+
+    /*
+      Als navigator.share zonder fout
+      terugkomt, is het delen afgerond.
+    */
+
+    return true;
+
+  } catch (error) {
+    /*
+      AbortError betekent normaal dat de
+      gebruiker zelf het deelvenster sloot.
+
+      Dan willen we NIET automatisch daarna
+      de foto of tekst openen.
+    */
+
+    if (
+      error &&
+      error.name === "AbortError"
+    ) {
+      throw error;
+    }
+
+    console.error(
+      `${label} delen mislukt:`,
+      {
+        name:
+          error?.name,
+        message:
+          error?.message,
+        file:
+          file.name,
+        type:
+          file.type,
+        size:
+          file.size
+      }
+    );
+
+    return false;
+  }
+}
+
+
+/* ========================================
+   ALLEEN TEKST DELEN
+======================================== */
+
+async function shareTextOnly() {
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        text: currentMessage
+      });
+
+      return true;
+
+    } catch (error) {
+      if (
+        error &&
+        error.name === "AbortError"
+      ) {
+        throw error;
+      }
+
+      console.error(
+        "Alleen tekst delen mislukt:",
+        error
+      );
+    }
+  }
+
+  return false;
+}
+
+
+/* ========================================
+   DELEN VIA WHATSAPP / DEELMENU
+
+   VOLGORDE:
+
+   1. Primaire media
+      bijvoorbeeld goalvideo
+
+   2. Fallback-media
+      bijvoorbeeld spelersfoto
+
+   3. Alleen tekst
+
+   4. Tekst naar klembord
+======================================== */
 
 async function shareWhatsApp() {
   if (!currentMessage) {
@@ -1978,62 +1914,71 @@ async function shareWhatsApp() {
   }
 
   try {
-    let file =
-      await getShareableMediaFile(
-        currentMediaPath
-      );
-
     /*
-      Als bijvoorbeeld de video niet
-      beschikbaar is, probeer foto.
+      STAP 1:
+      probeer primaire media.
+
+      Bij een goal waarbij UB gelijk
+      of voor staat is dit de video.
     */
 
-    if (
-      !file &&
-      currentFallbackMediaPath
-    ) {
-      file =
-        await getShareableMediaFile(
-          currentFallbackMediaPath
+    if (currentMediaPath) {
+      const primaryShared =
+        await tryShareWithMedia(
+          currentMediaPath,
+          "Primaire media"
         );
+
+      if (primaryShared) {
+        return;
+      }
     }
 
+
     /*
-      Probeer tekst + media.
+      STAP 2:
+      primaire media werkte niet.
+
+      Probeer de fallback-foto.
     */
 
     if (
-      file &&
-      navigator.canShare &&
-      navigator.canShare({
-        files: [file]
-      }) &&
-      navigator.share
+      currentFallbackMediaPath &&
+      currentFallbackMediaPath !==
+        currentMediaPath
     ) {
-      await navigator.share({
-        text: currentMessage,
-        files: [file]
-      });
+      const fallbackShared =
+        await tryShareWithMedia(
+          currentFallbackMediaPath,
+          "Fallback-media"
+        );
 
-      return;
+      if (fallbackShared) {
+        return;
+      }
     }
 
+
     /*
-      Media kan niet gedeeld worden.
-      Bericht zelf moet altijd door kunnen.
+      STAP 3:
+      geen media kunnen delen.
+
+      Probeer het bericht zonder media.
     */
 
-    if (navigator.share) {
-      await navigator.share({
-        text: currentMessage
-      });
+    const textShared =
+      await shareTextOnly();
 
+    if (textShared) {
       return;
     }
 
+
     /*
-      Laatste fallback:
-      tekst naar klembord.
+      STAP 4:
+      zelfs Web Share werkt niet.
+
+      Kopieer bericht.
     */
 
     await navigator.clipboard.writeText(
@@ -2041,13 +1986,13 @@ async function shareWhatsApp() {
     );
 
     alert(
-      "Bericht gekopieerd. Open WhatsApp en plak het bericht handmatig."
+      "Media kon niet worden gedeeld. Het bericht is naar het klembord gekopieerd."
     );
 
   } catch (error) {
     /*
       Gebruiker heeft zelf het
-      deelvenster gesloten.
+      Android/iOS-deelvenster gesloten.
     */
 
     if (
@@ -2057,7 +2002,10 @@ async function shareWhatsApp() {
       return;
     }
 
-    console.error(error);
+    console.error(
+      "Onverwachte fout tijdens delen:",
+      error
+    );
 
     try {
       await navigator.clipboard.writeText(
@@ -2068,10 +2016,9 @@ async function shareWhatsApp() {
         "Delen lukte niet. Het bericht is gekopieerd."
       );
 
-    } catch (
-      clipboardError
-    ) {
+    } catch (clipboardError) {
       console.error(
+        "Kopiëren naar klembord mislukte:",
         clipboardError
       );
 
