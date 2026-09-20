@@ -4,70 +4,70 @@
     "naam": "Jelle Kniest",
     "teamId": "UB",
     "foto": null,
-    "video": "images/videos/jelle-kniest.mov"
+    "video": "images/videos/jelle-kniest.mp4"
   },
   {
     "id": "stijn-tiecken",
     "naam": "Stijn Tiecken",
     "teamId": "UB",
     "foto": "images/spelers/stijn-tiecken.PNG",
-    "video": "images/videos/stijn-tiecken.mov"
+    "video": "images/videos/stijn-tiecken.mp4"
   },
   {
     "id": "jochem-robben",
     "naam": "Jochem Robben",
     "teamId": "UB",
     "foto": "images/spelers/jochem-robben.PNG",
-    "video": "images/videos/jochem-robben.mov"
+    "video": "images/videos/jochem-robben.mp4"
   },
   {
     "id": "wouter-bluemink",
     "naam": "Wouter Bluemink",
     "teamId": "UB",
     "foto": "images/spelers/wouter-bluemink.PNG",
-    "video": "images/videos/wouter-bluemink.mov"
+    "video": "images/videos/wouter-bluemink.mp4"
   },
   {
     "id": "pim-slutter",
     "naam": "Pim Slutter",
     "teamId": "UB",
     "foto": "images/spelers/pim-slutter.PNG",
-    "video": "images/videos/pim-slutter.mov"
+    "video": "images/videos/pim-slutter.mp4"
   },
   {
     "id": "noah-van-hal",
     "naam": "Noah van Hal",
     "teamId": "UB",
     "foto": "images/spelers/noah-van-hal.PNG",
-    "video": "images/videos/noah-van-hal.mov"
+    "video": "images/videos/noah-van-hal.mp4"
   },
   {
     "id": "twan-kraan",
     "naam": "Twan Kraan",
     "teamId": "UB",
     "foto": "images/spelers/twan-kraan.PNG",
-    "video": "images/videos/twan-kraan.mov"
+    "video": "images/videos/twan-kraan.mp4"
   },
   {
     "id": "joep-nijenhuis",
     "naam": "Joep Nijenhuis",
     "teamId": "UB",
     "foto": null,
-    "video": "images/videos/joep-nijenhuis.mov"
+    "video": "images/videos/joep-nijenhuis.mp4"
   },
   {
     "id": "max-te-lintum",
     "naam": "Max te Lintum",
     "teamId": "UB",
     "foto": "images/spelers/max-te-lintum.PNG",
-    "video": "images/videos/max-te-lintum.mov"
+    "video": "images/videos/max-te-lintum.mp4"
   },
   {
     "id": "joris-beumer",
     "naam": "Joris Beumer",
     "teamId": "UB",
     "foto": "images/spelers/joris-beumer.PNG",
-    "video": "images/videos/joris-beumer.mov"
+    "video": "images/videos/joris-beumer.mp4"
   },
   {
     "id": "cas-heuvels",
@@ -95,42 +95,42 @@
     "naam": "Roel Gebbinck",
     "teamId": "UB",
     "foto": null,
-    "video": "images/videos/roel-gebbinck.mov"
+    "video": "images/videos/roel-gebbinck.mp4"
   },
   {
     "id": "dirk-slutter",
     "naam": "Dirk Slutter",
     "teamId": "UB",
     "foto": null,
-    "video": "images/videos/dirk-slutter.mov"
+    "video": "images/videos/dirk-slutter.mp4"
   },
   {
     "id": "ties-smeitink",
     "naam": "Ties Smeitink",
     "teamId": "UB",
     "foto": "images/spelers/ties-smeitink.PNG",
-    "video": "images/videos/ties-smeitink.mov"
+    "video": "images/videos/ties-smeitink.mp4"
   },
   {
     "id": "luuk-aalders",
     "naam": "Luuk Aalders",
     "teamId": "UB",
     "foto": "images/spelers/luuk-aalders.PNG",
-    "video": "images/videos/luuk-aalders.mov"
+    "video": "images/videos/luuk-aalders.mp4"
   },
   {
     "id": "jarl-erinkveld",
     "naam": "Jarl Erinkveld",
     "teamId": "UB",
     "foto": "images/spelers/jarl-erinkveld.PNG",
-    "video": "images/videos/jarl-erinkveld.mov"
+    "video": "images/videos/jarl-erinkveld.mp4"
   },
   {
     "id": "kees-weijers",
     "naam": "Kees Weijers",
     "teamId": "UB",
     "foto": "images/spelers/kees-weijers.PNG",
-    "video": "images/videos/kees-weijers.mov"
+    "video": "images/videos/kees-weijers.mp4"
   },
   {
     "id": "sep-te-lintum",
@@ -144,7 +144,7 @@
     "naam": "Tygo Egberts",
     "teamId": "UB",
     "foto": "images/spelers/tygo-egberts.PNG",
-    "video": "images/videos/tygo-egberts.mov"
+    "video": "images/videos/tygo-egberts.mp4"
   },
   {
     "id": "sevki-nohut",
@@ -172,6 +172,6 @@
     "naam": "Okan Yilmaz",
     "teamId": "UB",
     "foto": null,
-    "video": "images/videos/okan-yilmaz.mov"
+    "video": "images/videos/okan-yilmaz.mp4"
   }
 ]
