@@ -179,10 +179,6 @@ function restoreMatchState() {
     currentMessage =
       state.currentMessage || "";
 
-    /*
-      Ondersteunt ook wedstrijden die nog
-      met de oude currentPhotoPath zijn opgeslagen.
-    */
     currentMediaPath =
       state.currentMediaPath ||
       state.currentPhotoPath ||
@@ -283,6 +279,7 @@ function fillTeamDropdowns() {
   if (matchType) {
     matchType.onchange = () => {
       fillTeamDropdowns();
+      updateActionButtons();
       saveMatchState();
     };
   }
@@ -290,12 +287,14 @@ function fillTeamDropdowns() {
   teamA.onchange = () => {
     preventSameTeams("teamA");
     updateTeamNames();
+    updateActionButtons();
     saveMatchState();
   };
 
   teamB.onchange = () => {
     preventSameTeams("teamB");
     updateTeamNames();
+    updateActionButtons();
     saveMatchState();
   };
 }
@@ -341,15 +340,23 @@ function preventSameTeams(changedSelectId) {
 
 
 function updateTeamNames() {
-  document.getElementById(
-    "teamAName"
-  ).textContent =
-    getTeamName("teamA");
+  const teamAName =
+    document.getElementById("teamAName");
 
-  document.getElementById(
-    "teamBName"
-  ).textContent =
-    getTeamName("teamB");
+  const teamBName =
+    document.getElementById("teamBName");
+
+  if (teamAName) {
+    teamAName.textContent =
+      getTeamName("teamA");
+  }
+
+  if (teamBName) {
+    teamBName.textContent =
+      getTeamName("teamB");
+  }
+
+  updateActionButtons();
 }
 
 
@@ -366,29 +373,58 @@ function getTeamName(selectId) {
 }
 
 
+function getOpponentName() {
+  const teamAId =
+    document.getElementById("teamA")?.value;
+
+  if (teamAId === ownClubId) {
+    return getTeamName("teamB");
+  }
+
+  return getTeamName("teamA");
+}
+
+
+function updateActionButtons() {
+  const ownButton =
+    document.getElementById("ownGoalButton");
+
+  const opponentButton =
+    document.getElementById("opponentGoalButton");
+
+  if (ownButton) {
+    ownButton.textContent =
+      "⚽ Goal Ulftse Boys";
+  }
+
+  if (opponentButton) {
+    const opponentName =
+      getOpponentName() || "tegenstander";
+
+    opponentButton.textContent =
+      `⚽ Goal ${opponentName}`;
+  }
+}
+
+
 /* ========================================
    SPELERS
 ======================================== */
 
+function getOwnClubPlayers() {
+  return players.filter(
+    player =>
+      player.teamId === ownClubId
+  );
+}
+
+
 function loadOwnClubPlayers() {
   const ownClubPlayers =
-    players.filter(
-      player =>
-        player.teamId === ownClubId
-    );
+    getOwnClubPlayers();
 
   fillGoalScorerSelect(
-    "playerSelect",
-    ownClubPlayers
-  );
-
-  fillPlayerSelect(
-    "playerOut",
-    ownClubPlayers
-  );
-
-  fillPlayerSelect(
-    "playerIn",
+    "goalPlayerSelect",
     ownClubPlayers
   );
 
@@ -405,6 +441,10 @@ function fillGoalScorerSelect(
 ) {
   const select =
     document.getElementById(elementId);
+
+  if (!select) {
+    return;
+  }
 
   select.innerHTML = "";
 
@@ -427,12 +467,23 @@ function fillGoalScorerSelect(
 
 function fillPlayerSelect(
   elementId,
-  playerList
+  playerList,
+  includeUnknown = false
 ) {
   const select =
     document.getElementById(elementId);
 
+  if (!select) {
+    return;
+  }
+
   select.innerHTML = "";
+
+  if (includeUnknown) {
+    select.add(
+      new Option("Onbekend", "")
+    );
+  }
 
   playerList.forEach(player => {
     select.add(
@@ -446,8 +497,15 @@ function fillPlayerSelect(
 
 
 function getSelectedPlayer(selectId) {
+  const select =
+    document.getElementById(selectId);
+
+  if (!select) {
+    return null;
+  }
+
   const playerId =
-    document.getElementById(selectId).value;
+    select.value;
 
   if (!playerId) {
     return null;
@@ -458,16 +516,6 @@ function getSelectedPlayer(selectId) {
       player => player.id === playerId
     ) || null
   );
-}
-
-
-function resetGoalScorerSelect() {
-  const select =
-    document.getElementById("playerSelect");
-
-  if (select) {
-    select.value = "";
-  }
 }
 
 
@@ -483,9 +531,7 @@ function startMatch() {
   ownGoals = [];
   nextGoalId = 1;
 
-  resetGoalScorerSelect();
   updateUnknownGoalReminder();
-
   updateScore();
 
   firstHalfStartedAt = Date.now();
@@ -636,18 +682,6 @@ function getOpponentScore() {
 
 /* ========================================
    MEDIAREGEL BIJ GOAL
-
-   NA goal nog achter:
-   -> foto
-
-   NA goal gelijk of voor:
-   -> video
-
-   Video ontbreekt:
-   -> foto
-
-   Foto ontbreekt:
-   -> alleen tekst
 ======================================== */
 
 function getGoalMediaForPlayer(player) {
@@ -697,151 +731,109 @@ function normalizeMediaPath(value) {
 
 
 /* ========================================
-   GOAL THUIS
+   GOAL ULFTSE BOYS POPUP
 ======================================== */
 
-function goalTeamA() {
-  const teamAId =
-    document.getElementById("teamA").value;
+function openOwnGoalDialog() {
+  const select =
+    document.getElementById("goalPlayerSelect");
+
+  if (select) {
+    select.value = "";
+  }
+
+  const dialog =
+    document.getElementById("ownGoalDialog");
+
+  if (dialog) {
+    dialog.showModal();
+  }
+}
+
+
+function closeOwnGoalDialog() {
+  document.getElementById(
+    "ownGoalDialog"
+  )?.close();
+}
+
+
+function saveOwnGoal() {
+  const player =
+    getSelectedPlayer("goalPlayerSelect");
 
   const minute =
     getCurrentMinute();
 
-  lastGoal = {
-    previousScoreA: scoreA,
-    previousScoreB: scoreB,
-    ownGoalId: null
-  };
+  const teamAId =
+    document.getElementById("teamA").value;
 
   if (teamAId === ownClubId) {
-    const player =
-      getSelectedPlayer("playerSelect");
-
     scoreA++;
+  } else {
+    scoreB++;
+  }
 
-    updateScore();
+  updateScore();
 
-    const goal =
-      registerOwnGoal(
-        minute,
-        player
-      );
+  registerOwnGoal(
+    minute,
+    player
+  );
 
-    lastGoal.ownGoalId =
-      goal.id;
+  if (player) {
+    const media =
+      getGoalMediaForPlayer(player);
 
-    if (player) {
-      const media =
-        getGoalMediaForPlayer(player);
-
-      createMessage(
+    createMessage(
 `⚽🔥 GOOOAAALLL ULFTSE BOYS!!!
 
 ${formatMatchMinute(minute)} | ${getTeamName("teamA")} - ${getTeamName("teamB")} | ${scoreA}-${scoreB}
 
 ⚽ ${player.naam}`,
-        media.primary,
-        media.fallback
-      );
+      media.primary,
+      media.fallback
+    );
 
-    } else {
-      createMessage(
+  } else {
+    createMessage(
 `⚽🔥 GOOOAAALLL ULFTSE BOYS!!!
 
 ${formatMatchMinute(minute)} | ${getTeamName("teamA")} - ${getTeamName("teamB")} | ${scoreA}-${scoreB}`
-      );
-    }
-
-    resetGoalScorerSelect();
-
-    saveMatchState();
-
-    return;
+    );
   }
 
-  scoreA++;
+  closeOwnGoalDialog();
 
-  updateScore();
-
-  createMessage(
-`⚽ Goal ${getTeamName("teamA")}
-
-${formatMatchMinute(minute)} | ${getTeamName("teamA")} - ${getTeamName("teamB")} | ${scoreA}-${scoreB}`
-  );
-
+  updateUnknownGoalReminder();
   saveMatchState();
 }
 
 
 /* ========================================
-   GOAL UIT
+   GOAL TEGENSTANDER
 ======================================== */
 
-function goalTeamB() {
-  const teamBId =
-    document.getElementById("teamB").value;
-
+function goalOpponent() {
   const minute =
     getCurrentMinute();
 
-  lastGoal = {
-    previousScoreA: scoreA,
-    previousScoreB: scoreB,
-    ownGoalId: null
-  };
+  const teamAId =
+    document.getElementById("teamA").value;
 
-  if (teamBId === ownClubId) {
-    const player =
-      getSelectedPlayer("playerSelect");
+  const opponentName =
+    getOpponentName();
 
+  if (teamAId === ownClubId) {
     scoreB++;
-
-    updateScore();
-
-    const goal =
-      registerOwnGoal(
-        minute,
-        player
-      );
-
-    lastGoal.ownGoalId =
-      goal.id;
-
-    if (player) {
-      const media =
-        getGoalMediaForPlayer(player);
-
-      createMessage(
-`⚽🔥 GOOOAAALLL ULFTSE BOYS!!!
-
-${formatMatchMinute(minute)} | ${getTeamName("teamA")} - ${getTeamName("teamB")} | ${scoreA}-${scoreB}
-
-⚽ ${player.naam}`,
-        media.primary,
-        media.fallback
-      );
-
-    } else {
-      createMessage(
-`⚽🔥 GOOOAAALLL ULFTSE BOYS!!!
-
-${formatMatchMinute(minute)} | ${getTeamName("teamA")} - ${getTeamName("teamB")} | ${scoreA}-${scoreB}`
-      );
-    }
-
-    resetGoalScorerSelect();
-
-    saveMatchState();
-
-    return;
+  } else {
+    scoreA++;
   }
-
-  scoreB++;
 
   updateScore();
 
   createMessage(
-`⚽ Goal ${getTeamName("teamB")}
+`⚽ Goal ${opponentName}
 
 ${formatMatchMinute(minute)} | ${getTeamName("teamA")} - ${getTeamName("teamB")} | ${scoreA}-${scoreB}`
   );
@@ -862,43 +854,34 @@ function getUnknownGoals() {
 
 
 function updateUnknownGoalReminder() {
-  const reminder =
+  const button =
     document.getElementById(
-      "unknownGoalReminder"
+      "manageUnknownGoalsButton"
     );
 
-  const reminderText =
-    document.getElementById(
-      "unknownGoalReminderText"
-    );
-
-  if (!reminder || !reminderText) {
+  if (!button) {
     return;
   }
 
-  const unknownGoals =
-    getUnknownGoals();
+  const count =
+    getUnknownGoals().length;
 
-  if (unknownGoals.length === 0) {
-    reminder.classList.add("hidden");
-    reminderText.textContent = "";
+  if (count === 0) {
+    button.classList.add("hidden");
     return;
   }
 
-  reminder.classList.remove("hidden");
+  button.classList.remove("hidden");
 
-  if (unknownGoals.length === 1) {
-    reminderText.textContent =
-      "1 doelpunt zonder doelpuntenmaker";
-  } else {
-    reminderText.textContent =
-      `${unknownGoals.length} doelpunten zonder doelpuntenmaker`;
-  }
+  button.textContent =
+    count === 1
+      ? "👤 Onbekende goal beheren"
+      : `👤 Onbekende goals beheren (${count})`;
 }
 
 
 /* ========================================
-   DOELPUNTENMAKER LATER TOEWIJZEN
+   ONBEKENDE GOAL BEHEREN
 ======================================== */
 
 function openAssignGoalDialog() {
@@ -906,10 +889,6 @@ function openAssignGoalDialog() {
     getUnknownGoals();
 
   if (unknownGoals.length === 0) {
-    alert(
-      "Er zijn geen doelpunten zonder doelpuntenmaker."
-    );
-
     return;
   }
 
@@ -917,6 +896,10 @@ function openAssignGoalDialog() {
     document.getElementById(
       "unknownGoalSelect"
     );
+
+  if (!goalSelect) {
+    return;
+  }
 
   goalSelect.innerHTML = "";
 
@@ -946,14 +929,14 @@ function openAssignGoalDialog() {
 
   document.getElementById(
     "assignGoalDialog"
-  ).showModal();
+  )?.showModal();
 }
 
 
 function closeAssignGoalDialog() {
   document.getElementById(
     "assignGoalDialog"
-  ).close();
+  )?.close();
 }
 
 
@@ -962,7 +945,7 @@ function assignGoalScorer() {
     Number(
       document.getElementById(
         "unknownGoalSelect"
-      ).value
+      )?.value
     );
 
   const player =
@@ -991,7 +974,6 @@ function assignGoalScorer() {
     );
 
     closeAssignGoalDialog();
-
     return;
   }
 
@@ -1016,127 +998,565 @@ De ${goal.scoreA}-${goal.scoreB} van Ulftse Boys werd gemaakt door ${player.naam
 
 
 /* ========================================
-   LAATSTE GOAL ONGEDAAN MAKEN
+   CORRECTIE TUSSENSTAND
 ======================================== */
 
-function openUndoGoalDialog() {
-  if (!lastGoal) {
+function openScoreCorrectionDialog() {
+  const dialog =
+    document.getElementById(
+      "scoreCorrectionDialog"
+    );
+
+  const inputA =
+    document.getElementById(
+      "scoreCorrectionA"
+    );
+
+  const inputB =
+    document.getElementById(
+      "scoreCorrectionB"
+    );
+
+  const teamAName =
+    document.getElementById(
+      "scoreCorrectionTeamAName"
+    );
+
+  const teamBName =
+    document.getElementById(
+      "scoreCorrectionTeamBName"
+    );
+
+  if (inputA) {
+    inputA.value = scoreA;
+  }
+
+  if (inputB) {
+    inputB.value = scoreB;
+  }
+
+  if (teamAName) {
+    teamAName.textContent =
+      getTeamName("teamA");
+  }
+
+  if (teamBName) {
+    teamBName.textContent =
+      getTeamName("teamB");
+  }
+
+  renderCorrectionScorers();
+
+  dialog?.showModal();
+}
+
+
+function closeScoreCorrectionDialog() {
+  document.getElementById(
+    "scoreCorrectionDialog"
+  )?.close();
+}
+
+
+function changeCorrectionScore(side, delta) {
+  const input =
+    document.getElementById(
+      side === "A"
+        ? "scoreCorrectionA"
+        : "scoreCorrectionB"
+    );
+
+  if (!input) {
+    return;
+  }
+
+  const current =
+    Math.max(
+      0,
+      parseInt(input.value, 10) || 0
+    );
+
+  input.value =
+    Math.max(
+      0,
+      current + delta
+    );
+
+  renderCorrectionScorers();
+}
+
+
+function getCorrectionOwnScore() {
+  const teamAId =
+    document.getElementById("teamA")?.value;
+
+  const inputA =
+    document.getElementById(
+      "scoreCorrectionA"
+    );
+
+  const inputB =
+    document.getElementById(
+      "scoreCorrectionB"
+    );
+
+  const correctedA =
+    Math.max(
+      0,
+      parseInt(inputA?.value, 10) || 0
+    );
+
+  const correctedB =
+    Math.max(
+      0,
+      parseInt(inputB?.value, 10) || 0
+    );
+
+  return teamAId === ownClubId
+    ? correctedA
+    : correctedB;
+}
+
+
+function renderCorrectionScorers() {
+  const container =
+    document.getElementById(
+      "correctionScorers"
+    );
+
+  if (!container) {
+    return;
+  }
+
+  const requiredGoals =
+    getCorrectionOwnScore();
+
+  const ownClubPlayers =
+    getOwnClubPlayers();
+
+  container.innerHTML = "";
+
+  if (requiredGoals === 0) {
+    const text =
+      document.createElement("p");
+
+    text.className =
+      "correction-no-goals";
+
+    text.textContent =
+      "Geen doelpunten van Ulftse Boys.";
+
+    container.appendChild(text);
+    return;
+  }
+
+  const title =
+    document.createElement("h4");
+
+  title.textContent =
+    "Doelpunten Ulftse Boys";
+
+  container.appendChild(title);
+
+  for (
+    let i = 0;
+    i < requiredGoals;
+    i++
+  ) {
+    const label =
+      document.createElement("label");
+
+    label.textContent =
+      `Goal ${i + 1}:`;
+
+    const select =
+      document.createElement("select");
+
+    select.className =
+      "correction-scorer";
+
+    select.dataset.goalIndex =
+      String(i);
+
+    select.add(
+      new Option(
+        "Onbekend",
+        ""
+      )
+    );
+
+    ownClubPlayers.forEach(player => {
+      select.add(
+        new Option(
+          player.naam,
+          player.id
+        )
+      );
+    });
+
+    const existingGoal =
+      ownGoals[i];
+
+    if (
+      existingGoal &&
+      existingGoal.playerId
+    ) {
+      select.value =
+        existingGoal.playerId;
+    } else {
+      select.value = "";
+    }
+
+    label.appendChild(select);
+    container.appendChild(label);
+  }
+}
+
+
+function saveScoreCorrection() {
+  const inputA =
+    document.getElementById(
+      "scoreCorrectionA"
+    );
+
+  const inputB =
+    document.getElementById(
+      "scoreCorrectionB"
+    );
+
+  const newScoreA =
+    parseInt(inputA?.value, 10);
+
+  const newScoreB =
+    parseInt(inputB?.value, 10);
+
+  if (
+    !Number.isInteger(newScoreA) ||
+    !Number.isInteger(newScoreB) ||
+    newScoreA < 0 ||
+    newScoreB < 0
+  ) {
     alert(
-      "Er is geen doelpunt om terug te draaien."
+      "Vul een geldige tussenstand in."
     );
 
     return;
   }
 
-  document.getElementById(
-    "undoGoalDialog"
-  ).showModal();
-}
+  scoreA = newScoreA;
+  scoreB = newScoreB;
 
+  const teamAId =
+    document.getElementById("teamA")?.value;
 
-function closeUndoGoalDialog() {
-  document.getElementById(
-    "undoGoalDialog"
-  ).close();
-}
+  const ownScore =
+    teamAId === ownClubId
+      ? scoreA
+      : scoreB;
 
+  const scorerSelects =
+    Array.from(
+      document.querySelectorAll(
+        "#correctionScorers .correction-scorer"
+      )
+    );
 
-function undoLastGoal(reason) {
-  if (!lastGoal) {
-    closeUndoGoalDialog();
-    return;
+  const correctedGoals = [];
+
+  for (
+    let i = 0;
+    i < ownScore;
+    i++
+  ) {
+    const existingGoal =
+      ownGoals[i];
+
+    const select =
+      scorerSelects[i];
+
+    const playerId =
+      select?.value || null;
+
+    const player =
+      playerId
+        ? players.find(
+            item =>
+              item.id === playerId
+          )
+        : null;
+
+    correctedGoals.push({
+      id:
+        existingGoal?.id ||
+        nextGoalId++,
+
+      minute:
+        existingGoal?.minute ??
+        getCurrentMinute(),
+
+      minuteText:
+        existingGoal?.minuteText ||
+        formatMatchMinute(
+          getCurrentMinute()
+        ),
+
+      scoreA:
+        existingGoal?.scoreA ??
+        scoreA,
+
+      scoreB:
+        existingGoal?.scoreB ??
+        scoreB,
+
+      playerId:
+        player
+          ? player.id
+          : null,
+
+      playerName:
+        player
+          ? player.naam
+          : null
+    });
   }
 
-  scoreA =
-    lastGoal.previousScoreA;
-
-  scoreB =
-    lastGoal.previousScoreB;
+  ownGoals =
+    correctedGoals;
 
   updateScore();
+  updateUnknownGoalReminder();
 
-  if (lastGoal.ownGoalId) {
-    ownGoals =
-      ownGoals.filter(
-        goal =>
-          goal.id !==
-          lastGoal.ownGoalId
-      );
+  closeScoreCorrectionDialog();
 
-    updateUnknownGoalReminder();
-  }
+  createMessage(
+`🔄 Tussenstand herzien
 
-  lastGoal = null;
+De tussenstand is gecorrigeerd:
 
-  closeUndoGoalDialog();
-
-  if (reason === "disallowed") {
-    createMessage(
-`❌ Doelpunt afgekeurd
-
-Nieuwe tussenstand:
 ${getTeamName("teamA")} - ${getTeamName("teamB")} | ${scoreA}-${scoreB}`
-    );
+  );
 
-    saveMatchState();
-
-    return;
-  }
-
-  if (reason === "mistake") {
-    currentMessage = "";
-    currentMediaPath = null;
-    currentFallbackMediaPath = null;
-
-    document.getElementById(
-      "messagePreview"
-    ).textContent =
-      "Laatste goal verwijderd wegens verkeerde invoer.";
-
-    clearMediaPreview();
-
-    saveMatchState();
-  }
+  saveMatchState();
 }
 
 
 /* ========================================
-   WISSEL ULFTSE BOYS
+   WISSEL POPUP
 ======================================== */
 
-function substitution() {
-  const outPlayer =
-    getSelectedPlayer("playerOut");
-
-  const inPlayer =
-    getSelectedPlayer("playerIn");
-
-  if (!outPlayer || !inPlayer) {
-    alert(
-      "Kies speler eruit en speler erin."
+function openSubstitutionDialog() {
+  const container =
+    document.getElementById(
+      "substitutionRows"
     );
 
+  if (!container) {
     return;
   }
 
-  if (outPlayer.id === inPlayer.id) {
-    alert(
-      "Speler eruit en erin mogen niet dezelfde speler zijn."
+  container.innerHTML = "";
+
+  addSubstitutionRow();
+
+  document.getElementById(
+    "substitutionDialog"
+  )?.showModal();
+}
+
+
+function closeSubstitutionDialog() {
+  document.getElementById(
+    "substitutionDialog"
+  )?.close();
+}
+
+
+function addSubstitutionRow() {
+  const container =
+    document.getElementById(
+      "substitutionRows"
     );
 
+  if (!container) {
     return;
+  }
+
+  const ownClubPlayers =
+    getOwnClubPlayers();
+
+  const row =
+    document.createElement("div");
+
+  row.className =
+    "substitution-row";
+
+  const outLabel =
+    document.createElement("label");
+
+  outLabel.textContent =
+    "Speler eruit:";
+
+  const outSelect =
+    document.createElement("select");
+
+  outSelect.className =
+    "sub-player-out";
+
+  ownClubPlayers.forEach(player => {
+    outSelect.add(
+      new Option(
+        player.naam,
+        player.id
+      )
+    );
+  });
+
+  outLabel.appendChild(outSelect);
+
+
+  const inLabel =
+    document.createElement("label");
+
+  inLabel.textContent =
+    "Speler erin:";
+
+  const inSelect =
+    document.createElement("select");
+
+  inSelect.className =
+    "sub-player-in";
+
+  ownClubPlayers.forEach(player => {
+    inSelect.add(
+      new Option(
+        player.naam,
+        player.id
+      )
+    );
+  });
+
+  inLabel.appendChild(inSelect);
+
+
+  const remove =
+    document.createElement("button");
+
+  remove.type = "button";
+  remove.className =
+    "remove-substitution danger";
+
+  remove.textContent =
+    "✕ Verwijderen";
+
+  remove.onclick = () => {
+    row.remove();
+
+    if (
+      container.children.length === 0
+    ) {
+      addSubstitutionRow();
+    }
+  };
+
+
+  row.appendChild(outLabel);
+  row.appendChild(inLabel);
+  row.appendChild(remove);
+
+  container.appendChild(row);
+}
+
+
+function saveSubstitutions() {
+  const rows =
+    Array.from(
+      document.querySelectorAll(
+        "#substitutionRows .substitution-row"
+      )
+    );
+
+  if (rows.length === 0) {
+    return;
+  }
+
+  const substitutions = [];
+
+  for (const row of rows) {
+    const outId =
+      row.querySelector(
+        ".sub-player-out"
+      )?.value;
+
+    const inId =
+      row.querySelector(
+        ".sub-player-in"
+      )?.value;
+
+    const outPlayer =
+      players.find(
+        player =>
+          player.id === outId
+      );
+
+    const inPlayer =
+      players.find(
+        player =>
+          player.id === inId
+      );
+
+    if (
+      !outPlayer ||
+      !inPlayer
+    ) {
+      alert(
+        "Kies bij iedere wissel een speler eruit en een speler erin."
+      );
+
+      return;
+    }
+
+    if (
+      outPlayer.id ===
+      inPlayer.id
+    ) {
+      alert(
+        `${outPlayer.naam} kan niet tegelijk eruit en erin.`
+      );
+
+      return;
+    }
+
+    substitutions.push({
+      outPlayer,
+      inPlayer
+    });
   }
 
   const minute =
     getCurrentMinute();
 
+  const lines =
+    substitutions.map(
+      (item, index) => {
+        const prefix =
+          substitutions.length > 1
+            ? `Wissel ${index + 1}:\n`
+            : "";
+
+        return (
+`${prefix}Erin: ${item.inPlayer.naam} ➡️
+Eruit: ${item.outPlayer.naam} ⬅️`
+        );
+      }
+    );
+
   createMessage(
 `🔄 ${formatMatchMinute(minute)} | Wissel Ulftse Boys
 
-Erin: ${inPlayer.naam} ➡️
-Eruit: ${outPlayer.naam} ⬅️`
+${lines.join("\n\n")}`
   );
 
+  closeSubstitutionDialog();
   saveMatchState();
 }
 
@@ -1175,7 +1595,6 @@ function resetMatch(skipConfirm = false) {
   ownGoals = [];
   nextGoalId = 1;
 
-  resetGoalScorerSelect();
   updateUnknownGoalReminder();
 
   updateScore();
@@ -1184,14 +1603,25 @@ function resetMatch(skipConfirm = false) {
     "Nog niet gestart"
   );
 
-  document.getElementById(
-    "minute"
-  ).textContent = "0'";
+  const minuteElement =
+    document.getElementById(
+      "minute"
+    );
 
-  document.getElementById(
-    "messagePreview"
-  ).textContent =
-    "Nog geen bericht.";
+  if (minuteElement) {
+    minuteElement.textContent =
+      "0'";
+  }
+
+  const preview =
+    document.getElementById(
+      "messagePreview"
+    );
+
+  if (preview) {
+    preview.textContent =
+      "Nog geen bericht.";
+  }
 
   clearMediaPreview();
 
@@ -1204,20 +1634,38 @@ function resetMatch(skipConfirm = false) {
 ======================================== */
 
 function updateScore() {
-  document.getElementById(
-    "scoreA"
-  ).textContent = scoreA;
+  const elementA =
+    document.getElementById(
+      "scoreA"
+    );
 
-  document.getElementById(
-    "scoreB"
-  ).textContent = scoreB;
+  const elementB =
+    document.getElementById(
+      "scoreB"
+    );
+
+  if (elementA) {
+    elementA.textContent =
+      scoreA;
+  }
+
+  if (elementB) {
+    elementB.textContent =
+      scoreB;
+  }
 }
 
 
 function setStatus(text) {
-  document.getElementById(
-    "status"
-  ).textContent = text;
+  const element =
+    document.getElementById(
+      "status"
+    );
+
+  if (element) {
+    element.textContent =
+      text;
+  }
 }
 
 
@@ -1252,9 +1700,16 @@ function updateStatusFromMatchState() {
 
 function startTimerDisplay() {
   const updateMinuteDisplay = () => {
-    document.getElementById(
-      "minute"
-    ).textContent =
+    const minuteElement =
+      document.getElementById(
+        "minute"
+      );
+
+    if (!minuteElement) {
+      return;
+    }
+
+    minuteElement.textContent =
       formatMatchMinute(
         getCurrentMinute()
       );
@@ -1270,7 +1725,10 @@ function startTimerDisplay() {
 
 
 function getCurrentRawMinute() {
-  if (matchStatus === "not_started") {
+  if (
+    matchStatus ===
+    "not_started"
+  ) {
     return 0;
   }
 
@@ -1281,7 +1739,10 @@ function getCurrentRawMinute() {
     return pausedMinute;
   }
 
-  if (matchStatus === "first_half") {
+  if (
+    matchStatus ===
+    "first_half"
+  ) {
     if (!firstHalfStartedAt) {
       return pausedMinute || 0;
     }
@@ -1292,11 +1753,16 @@ function getCurrentRawMinute() {
 
     return Math.max(
       1,
-      Math.ceil(diff / 60000)
+      Math.ceil(
+        diff / 60000
+      )
     );
   }
 
-  if (matchStatus === "second_half") {
+  if (
+    matchStatus ===
+    "second_half"
+  ) {
     if (!secondHalfStartedAt) {
       return pausedMinute || 45;
     }
@@ -1309,7 +1775,9 @@ function getCurrentRawMinute() {
       45 +
       Math.max(
         1,
-        Math.ceil(diff / 60000)
+        Math.ceil(
+          diff / 60000
+        )
       )
     );
   }
@@ -1330,22 +1798,30 @@ function formatMatchMinute(minute) {
 
   if (
     (
-      matchStatus === "first_half" ||
-      matchStatus === "half_time"
+      matchStatus ===
+        "first_half" ||
+      matchStatus ===
+        "half_time"
     ) &&
     minute > 45
   ) {
-    return `45+${minute - 45}'`;
+    return (
+      `45+${minute - 45}'`
+    );
   }
 
   if (
     (
-      matchStatus === "second_half" ||
-      matchStatus === "ended"
+      matchStatus ===
+        "second_half" ||
+      matchStatus ===
+        "ended"
     ) &&
     minute > 90
   ) {
-    return `90+${minute - 90}'`;
+    return (
+      `90+${minute - 90}'`
+    );
   }
 
   return `${minute}'`;
@@ -1364,16 +1840,24 @@ function createMessage(
   currentMessage = text;
 
   currentMediaPath =
-    normalizeMediaPath(mediaPath);
+    normalizeMediaPath(
+      mediaPath
+    );
 
   currentFallbackMediaPath =
     normalizeMediaPath(
       fallbackMediaPath
     );
 
-  document.getElementById(
-    "messagePreview"
-  ).textContent = text;
+  const preview =
+    document.getElementById(
+      "messagePreview"
+    );
+
+  if (preview) {
+    preview.textContent =
+      text;
+  }
 
   showMediaPreview(
     currentMediaPath,
@@ -1383,10 +1867,17 @@ function createMessage(
 
 
 function restoreMessagePreview() {
-  if (currentMessage) {
+  const preview =
     document.getElementById(
       "messagePreview"
-    ).textContent =
+    );
+
+  if (!preview) {
+    return;
+  }
+
+  if (currentMessage) {
+    preview.textContent =
       currentMessage;
 
     showMediaPreview(
@@ -1395,9 +1886,7 @@ function restoreMessagePreview() {
     );
 
   } else {
-    document.getElementById(
-      "messagePreview"
-    ).textContent =
+    preview.textContent =
       "Nog geen bericht.";
 
     clearMediaPreview();
@@ -1416,20 +1905,29 @@ function showMediaPreview(
   fallbackPath = null
 ) {
   const primary =
-    normalizeMediaPath(primaryPath);
+    normalizeMediaPath(
+      primaryPath
+    );
 
   const fallback =
-    normalizeMediaPath(fallbackPath);
+    normalizeMediaPath(
+      fallbackPath
+    );
 
   clearMediaPreview();
 
-  if (!primary && !fallback) {
+  if (
+    !primary &&
+    !fallback
+  ) {
     return;
   }
 
   showSingleMediaPreview(
     primary || fallback,
-    primary ? fallback : null
+    primary
+      ? fallback
+      : null
   );
 }
 
@@ -1459,7 +1957,10 @@ function showSingleMediaPreview(
     );
 
   if (isVideoPath(path)) {
-    if (!video || !videoWrap) {
+    if (
+      !video ||
+      !videoWrap
+    ) {
       console.warn(
         "Video preview-element ontbreekt in index.html."
       );
@@ -1488,7 +1989,10 @@ function showSingleMediaPreview(
 
       video.onerror = null;
 
-      video.removeAttribute("src");
+      video.removeAttribute(
+        "src"
+      );
+
       video.load();
 
       videoWrap.classList.add(
@@ -1512,7 +2016,10 @@ function showSingleMediaPreview(
     return;
   }
 
-  if (!img || !photoWrap) {
+  if (
+    !img ||
+    !photoWrap
+  ) {
     return;
   }
 
@@ -1677,7 +2184,9 @@ async function getShareableMediaFile(path) {
       )
     ) {
       mediaType =
-        mimeByExtension[extension] || "";
+        mimeByExtension[
+          extension
+        ] || "";
     }
 
     if (
@@ -1740,11 +2249,6 @@ function canShareFile(file) {
     return false;
   }
 
-  /*
-    Sommige browsers hebben navigator.share
-    maar geen navigator.canShare.
-  */
-
   if (!navigator.canShare) {
     return true;
   }
@@ -1766,7 +2270,7 @@ function canShareFile(file) {
 
 
 /* ========================================
-   ÉÉN MEDIA-BESTAND PROBEREN TE DELEN
+   ÉÉN MEDIA-BESTAND DELEN
 ======================================== */
 
 async function tryShareWithMedia(
@@ -1797,9 +2301,12 @@ async function tryShareWithMedia(
     console.warn(
       `${label}: browser meldt dat dit bestand niet deelbaar is.`,
       {
-        name: file.name,
-        type: file.type,
-        size: file.size
+        name:
+          file.name,
+        type:
+          file.type,
+        size:
+          file.size
       }
     );
 
@@ -1808,29 +2315,19 @@ async function tryShareWithMedia(
 
   try {
     await navigator.share({
-      text: currentMessage,
-      files: [file]
+      text:
+        currentMessage,
+      files:
+        [file]
     });
-
-    /*
-      Als navigator.share zonder fout
-      terugkomt, is het delen afgerond.
-    */
 
     return true;
 
   } catch (error) {
-    /*
-      AbortError betekent normaal dat de
-      gebruiker zelf het deelvenster sloot.
-
-      Dan willen we NIET automatisch daarna
-      de foto of tekst openen.
-    */
-
     if (
       error &&
-      error.name === "AbortError"
+      error.name ===
+        "AbortError"
     ) {
       throw error;
     }
@@ -1864,7 +2361,8 @@ async function shareTextOnly() {
   if (navigator.share) {
     try {
       await navigator.share({
-        text: currentMessage
+        text:
+          currentMessage
       });
 
       return true;
@@ -1872,7 +2370,8 @@ async function shareTextOnly() {
     } catch (error) {
       if (
         error &&
-        error.name === "AbortError"
+        error.name ===
+          "AbortError"
       ) {
         throw error;
       }
@@ -1890,18 +2389,6 @@ async function shareTextOnly() {
 
 /* ========================================
    DELEN VIA WHATSAPP / DEELMENU
-
-   VOLGORDE:
-
-   1. Primaire media
-      bijvoorbeeld goalvideo
-
-   2. Fallback-media
-      bijvoorbeeld spelersfoto
-
-   3. Alleen tekst
-
-   4. Tekst naar klembord
 ======================================== */
 
 async function shareWhatsApp() {
@@ -1914,14 +2401,6 @@ async function shareWhatsApp() {
   }
 
   try {
-    /*
-      STAP 1:
-      probeer primaire media.
-
-      Bij een goal waarbij UB gelijk
-      of voor staat is dit de video.
-    */
-
     if (currentMediaPath) {
       const primaryShared =
         await tryShareWithMedia(
@@ -1933,14 +2412,6 @@ async function shareWhatsApp() {
         return;
       }
     }
-
-
-    /*
-      STAP 2:
-      primaire media werkte niet.
-
-      Probeer de fallback-foto.
-    */
 
     if (
       currentFallbackMediaPath &&
@@ -1958,28 +2429,12 @@ async function shareWhatsApp() {
       }
     }
 
-
-    /*
-      STAP 3:
-      geen media kunnen delen.
-
-      Probeer het bericht zonder media.
-    */
-
     const textShared =
       await shareTextOnly();
 
     if (textShared) {
       return;
     }
-
-
-    /*
-      STAP 4:
-      zelfs Web Share werkt niet.
-
-      Kopieer bericht.
-    */
 
     await navigator.clipboard.writeText(
       currentMessage
@@ -1990,14 +2445,10 @@ async function shareWhatsApp() {
     );
 
   } catch (error) {
-    /*
-      Gebruiker heeft zelf het
-      Android/iOS-deelvenster gesloten.
-    */
-
     if (
       error &&
-      error.name === "AbortError"
+      error.name ===
+        "AbortError"
     ) {
       return;
     }
@@ -2056,10 +2507,14 @@ function updateClock() {
     new Date();
 
   const dateOptions = {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric"
+    weekday:
+      "long",
+    day:
+      "numeric",
+    month:
+      "long",
+    year:
+      "numeric"
   };
 
   let dateString =

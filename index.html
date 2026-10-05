@@ -91,66 +91,27 @@
     <section class="card">
       <h2>Acties</h2>
 
-      <label>
-        Gescoord door:
-        <select id="playerSelect"></select>
-      </label>
-
       <div class="buttons">
-        <button
-          class="goal"
-          onclick="goalTeamA()"
-        >
-          ⚽ Goal thuis
+        <button id="ownGoalButton" class="goal" onclick="openOwnGoalDialog()">
+          ⚽ Goal Ulftse Boys
         </button>
 
-        <button
-          class="danger"
-          onclick="goalTeamB()"
-        >
-          ⚽ Goal uit
+        <button id="opponentGoalButton" class="danger" onclick="registerOpponentGoal()">
+          ⚽ Goal tegenstander
         </button>
 
-        <button onclick="openAssignGoalDialog()">
-          👤 Doelpuntenmaker toekennen
+        <button id="manageUnknownGoalsButton" class="hidden" onclick="openAssignGoalDialog()">
+          👤 Onbekende goal beheren
         </button>
 
-        <button onclick="openUndoGoalDialog()">
-          ↩ Laatste goal ongedaan maken
+        <button onclick="openScoreCorrectionDialog()">
+          🔧 Correctie tussenstand
+        </button>
+
+        <button onclick="openSubstitutionDialog()">
+          🔄 Wissel Ulftse Boys
         </button>
       </div>
-
-
-      <div
-        id="unknownGoalReminder"
-        class="hidden"
-        style="
-          margin-top: 12px;
-          padding: 10px 12px;
-          border-radius: 8px;
-          background: #fff3cd;
-          font-weight: 600;
-        "
-      >
-        ⚠️ <span id="unknownGoalReminderText"></span>
-      </div>
-
-
-      <div class="grid">
-        <label>
-          Speler eruit:
-          <select id="playerOut"></select>
-        </label>
-
-        <label>
-          Speler erin:
-          <select id="playerIn"></select>
-        </label>
-      </div>
-
-      <button onclick="substitution()">
-        🔁 Wissel Ulftse Boys
-      </button>
     </section>
 
 
@@ -193,11 +154,25 @@
     </section>
 
 
+    <dialog id="ownGoalDialog">
+      <h3>Goal Ulftse Boys</h3>
+      <p>Selecteer de doelpuntenmaker of laat deze op Onbekend staan.</p>
+      <label>
+        Doelpuntenmaker:
+        <select id="goalPlayerSelect"></select>
+      </label>
+      <div class="buttons dialog-actions">
+        <button class="goal" onclick="confirmOwnGoal()">⚽ Goal registreren</button>
+        <button onclick="closeOwnGoalDialog()">Annuleren</button>
+      </div>
+    </dialog>
+
+
     <dialog id="assignGoalDialog">
-      <h3>Doelpuntenmaker toekennen</h3>
+      <h3>Onbekende goal beheren</h3>
 
       <p>
-        Kies eerst het doelpunt en daarna de speler.
+        Kies het onbekende doelpunt en wijs de juiste speler toe.
       </p>
 
       <label>
@@ -229,32 +204,51 @@
     </dialog>
 
 
-    <dialog id="undoGoalDialog">
-      <h3>Laatste goal ongedaan maken</h3>
+    <dialog id="substitutionDialog">
+      <h3>Wissel Ulftse Boys</h3>
+      <p>Voeg één of meerdere wissels toe.</p>
+      <div id="substitutionRows"></div>
+      <button type="button" class="secondary-action" onclick="addSubstitutionRow()">+ Nog een wissel</button>
+      <div class="buttons dialog-actions">
+        <button class="goal" onclick="saveSubstitutions()">🔄 Wissel registreren</button>
+        <button onclick="closeSubstitutionDialog()">Annuleren</button>
+      </div>
+    </dialog>
 
-      <p>
-        Waarom wil je de goal terugdraaien?
-      </p>
 
-      <div class="buttons">
-        <button
-          class="danger"
-          onclick="undoLastGoal('disallowed')"
-        >
-          ❌ Afgekeurd
-        </button>
+    <dialog id="scoreCorrectionDialog">
+      <h3>Correctie tussenstand</h3>
 
-        <button onclick="undoLastGoal('mistake')">
-          ↩ Verkeerde invoer
-        </button>
+      <p>Pas de stand aan en controleer de doelpuntenmakers van Ulftse Boys.</p>
 
-        <button onclick="closeUndoGoalDialog()">
-          Annuleren
-        </button>
+      <div class="correction-score-row">
+        <strong id="correctionTeamAName">Thuis</strong>
+        <div class="correction-score-control">
+          <button type="button" onclick="changeCorrectionScore('A', -1)">−</button>
+          <input id="correctionScoreA" type="number" min="0" inputmode="numeric" value="0" oninput="renderCorrectionScorers()" />
+          <button type="button" onclick="changeCorrectionScore('A', 1)">+</button>
+        </div>
+      </div>
+
+      <div class="correction-score-row">
+        <strong id="correctionTeamBName">Uit</strong>
+        <div class="correction-score-control">
+          <button type="button" onclick="changeCorrectionScore('B', -1)">−</button>
+          <input id="correctionScoreB" type="number" min="0" inputmode="numeric" value="0" oninput="renderCorrectionScorers()" />
+          <button type="button" onclick="changeCorrectionScore('B', 1)">+</button>
+        </div>
+      </div>
+
+      <h4>Doelpunten Ulftse Boys</h4>
+      <div id="correctionScorers"></div>
+
+      <div class="buttons correction-actions">
+        <button class="goal" onclick="saveScoreCorrection()">✓ Wijzigingen opslaan</button>
+        <button onclick="closeScoreCorrectionDialog()">Annuleren</button>
       </div>
     </dialog>
 </main>
 
-  <script src="script.js"></script>
+  <script src="script.js?v=20261005-2"></script>
 </body>
 </html>
