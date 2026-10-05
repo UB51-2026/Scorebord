@@ -179,6 +179,10 @@ function restoreMatchState() {
     currentMessage =
       state.currentMessage || "";
 
+    /*
+      Ondersteunt ook wedstrijden die nog
+      met de oude currentPhotoPath zijn opgeslagen.
+    */
     currentMediaPath =
       state.currentMediaPath ||
       state.currentPhotoPath ||
@@ -279,7 +283,6 @@ function fillTeamDropdowns() {
   if (matchType) {
     matchType.onchange = () => {
       fillTeamDropdowns();
-      updateActionButtons();
       saveMatchState();
     };
   }
@@ -287,14 +290,12 @@ function fillTeamDropdowns() {
   teamA.onchange = () => {
     preventSameTeams("teamA");
     updateTeamNames();
-    updateActionButtons();
     saveMatchState();
   };
 
   teamB.onchange = () => {
     preventSameTeams("teamB");
     updateTeamNames();
-    updateActionButtons();
     saveMatchState();
   };
 }
@@ -340,23 +341,29 @@ function preventSameTeams(changedSelectId) {
 
 
 function updateTeamNames() {
-  const teamAName =
-    document.getElementById("teamAName");
+  document.getElementById(
+    "teamAName"
+  ).textContent =
+    getTeamName("teamA");
 
-  const teamBName =
-    document.getElementById("teamBName");
-
-  if (teamAName) {
-    teamAName.textContent =
-      getTeamName("teamA");
-  }
-
-  if (teamBName) {
-    teamBName.textContent =
-      getTeamName("teamB");
-  }
+  document.getElementById(
+    "teamBName"
+  ).textContent =
+    getTeamName("teamB");
 
   updateActionButtons();
+}
+
+function updateActionButtons() {
+  const teamAId = document.getElementById("teamA")?.value;
+  const teamBId = document.getElementById("teamB")?.value;
+  const opponentName = teamAId === ownClubId ? getTeamName("teamB") : getTeamName("teamA");
+
+  const ownButton = document.getElementById("ownGoalButton");
+  const opponentButton = document.getElementById("opponentGoalButton");
+
+  if (ownButton) ownButton.textContent = "⚽ Goal Ulftse Boys";
+  if (opponentButton) opponentButton.textContent = `⚽ Goal ${opponentName || "tegenstander"}`;
 }
 
 
@@ -373,55 +380,16 @@ function getTeamName(selectId) {
 }
 
 
-function getOpponentName() {
-  const teamAId =
-    document.getElementById("teamA")?.value;
-
-  if (teamAId === ownClubId) {
-    return getTeamName("teamB");
-  }
-
-  return getTeamName("teamA");
-}
-
-
-function updateActionButtons() {
-  const ownButton =
-    document.getElementById("ownGoalButton");
-
-  const opponentButton =
-    document.getElementById("opponentGoalButton");
-
-  if (ownButton) {
-    ownButton.textContent =
-      "⚽ Goal Ulftse Boys";
-  }
-
-  if (opponentButton) {
-    const opponentName =
-      getOpponentName() || "tegenstander";
-
-    opponentButton.textContent =
-      `⚽ Goal ${opponentName}`;
-  }
-}
-
-
 /* ========================================
    SPELERS
 ======================================== */
 
-function getOwnClubPlayers() {
-  return players.filter(
-    player =>
-      player.teamId === ownClubId
-  );
-}
-
-
 function loadOwnClubPlayers() {
   const ownClubPlayers =
-    getOwnClubPlayers();
+    players.filter(
+      player =>
+        player.teamId === ownClubId
+    );
 
   fillGoalScorerSelect(
     "goalPlayerSelect",
@@ -442,9 +410,7 @@ function fillGoalScorerSelect(
   const select =
     document.getElementById(elementId);
 
-  if (!select) {
-    return;
-  }
+  if (!select) return;
 
   select.innerHTML = "";
 
@@ -467,23 +433,14 @@ function fillGoalScorerSelect(
 
 function fillPlayerSelect(
   elementId,
-  playerList,
-  includeUnknown = false
+  playerList
 ) {
   const select =
     document.getElementById(elementId);
 
-  if (!select) {
-    return;
-  }
+  if (!select) return;
 
   select.innerHTML = "";
-
-  if (includeUnknown) {
-    select.add(
-      new Option("Onbekend", "")
-    );
-  }
 
   playerList.forEach(player => {
     select.add(
@@ -497,15 +454,8 @@ function fillPlayerSelect(
 
 
 function getSelectedPlayer(selectId) {
-  const select =
-    document.getElementById(selectId);
-
-  if (!select) {
-    return null;
-  }
-
   const playerId =
-    select.value;
+    document.getElementById(selectId).value;
 
   if (!playerId) {
     return null;
@@ -516,6 +466,12 @@ function getSelectedPlayer(selectId) {
       player => player.id === playerId
     ) || null
   );
+}
+
+
+function resetGoalScorerSelect() {
+  const select = document.getElementById("goalPlayerSelect");
+  if (select) select.value = "";
 }
 
 
@@ -531,7 +487,9 @@ function startMatch() {
   ownGoals = [];
   nextGoalId = 1;
 
+  resetGoalScorerSelect();
   updateUnknownGoalReminder();
+
   updateScore();
 
   firstHalfStartedAt = Date.now();
@@ -682,6 +640,18 @@ function getOpponentScore() {
 
 /* ========================================
    MEDIAREGEL BIJ GOAL
+
+   NA goal nog achter:
+   -> foto
+
+   NA goal gelijk of voor:
+   -> video
+
+   Video ontbreekt:
+   -> foto
+
+   Foto ontbreekt:
+   -> alleen tekst
 ======================================== */
 
 function getGoalMediaForPlayer(player) {
@@ -731,60 +701,32 @@ function normalizeMediaPath(value) {
 
 
 /* ========================================
-   GOAL ULFTSE BOYS POPUP
+   GOALS
 ======================================== */
 
 function openOwnGoalDialog() {
-  const select =
-    document.getElementById("goalPlayerSelect");
-
-  if (select) {
-    select.value = "";
-  }
-
-  const dialog =
-    document.getElementById("ownGoalDialog");
-
-  if (dialog) {
-    dialog.showModal();
-  }
+  const select = document.getElementById("goalPlayerSelect");
+  if (select) select.value = "";
+  document.getElementById("ownGoalDialog")?.showModal();
 }
-
 
 function closeOwnGoalDialog() {
-  document.getElementById(
-    "ownGoalDialog"
-  )?.close();
+  document.getElementById("ownGoalDialog")?.close();
 }
 
+function confirmOwnGoal() {
+  const player = getSelectedPlayer("goalPlayerSelect");
+  const minute = getCurrentMinute();
+  const teamAId = document.getElementById("teamA").value;
 
-function saveOwnGoal() {
-  const player =
-    getSelectedPlayer("goalPlayerSelect");
-
-  const minute =
-    getCurrentMinute();
-
-  const teamAId =
-    document.getElementById("teamA").value;
-
-  if (teamAId === ownClubId) {
-    scoreA++;
-  } else {
-    scoreB++;
-  }
+  if (teamAId === ownClubId) scoreA++;
+  else scoreB++;
 
   updateScore();
-
-  registerOwnGoal(
-    minute,
-    player
-  );
+  registerOwnGoal(minute, player);
 
   if (player) {
-    const media =
-      getGoalMediaForPlayer(player);
-
+    const media = getGoalMediaForPlayer(player);
     createMessage(
 `⚽🔥 GOOOAAALLL ULFTSE BOYS!!!
 
@@ -794,7 +736,6 @@ ${formatMatchMinute(minute)} | ${getTeamName("teamA")} - ${getTeamName("teamB")}
       media.primary,
       media.fallback
     );
-
   } else {
     createMessage(
 `⚽🔥 GOOOAAALLL ULFTSE BOYS!!!
@@ -804,40 +745,24 @@ ${formatMatchMinute(minute)} | ${getTeamName("teamA")} - ${getTeamName("teamB")}
   }
 
   closeOwnGoalDialog();
-
-  updateUnknownGoalReminder();
+  resetGoalScorerSelect();
   saveMatchState();
 }
 
+function registerOpponentGoal() {
+  const minute = getCurrentMinute();
+  const teamAId = document.getElementById("teamA").value;
+  const opponentName = teamAId === ownClubId ? getTeamName("teamB") : getTeamName("teamA");
 
-/* ========================================
-   GOAL TEGENSTANDER
-======================================== */
-
-function goalOpponent() {
-  const minute =
-    getCurrentMinute();
-
-  const teamAId =
-    document.getElementById("teamA").value;
-
-  const opponentName =
-    getOpponentName();
-
-  if (teamAId === ownClubId) {
-    scoreB++;
-  } else {
-    scoreA++;
-  }
+  if (teamAId === ownClubId) scoreB++;
+  else scoreA++;
 
   updateScore();
-
   createMessage(
 `⚽ Goal ${opponentName}
 
 ${formatMatchMinute(minute)} | ${getTeamName("teamA")} - ${getTeamName("teamB")} | ${scoreA}-${scoreB}`
   );
-
   saveMatchState();
 }
 
@@ -854,34 +779,18 @@ function getUnknownGoals() {
 
 
 function updateUnknownGoalReminder() {
-  const button =
-    document.getElementById(
-      "manageUnknownGoalsButton"
-    );
+  const button = document.getElementById("manageUnknownGoalsButton");
+  if (!button) return;
 
-  if (!button) {
-    return;
-  }
-
-  const count =
-    getUnknownGoals().length;
-
-  if (count === 0) {
-    button.classList.add("hidden");
-    return;
-  }
-
-  button.classList.remove("hidden");
-
-  button.textContent =
-    count === 1
-      ? "👤 Onbekende goal beheren"
-      : `👤 Onbekende goals beheren (${count})`;
+  const count = getUnknownGoals().length;
+  button.classList.toggle("hidden", count === 0);
+  button.textContent = count === 1
+    ? "👤 Onbekende goal beheren"
+    : `👤 Onbekende goals beheren (${count})`;
 }
 
-
 /* ========================================
-   ONBEKENDE GOAL BEHEREN
+   DOELPUNTENMAKER LATER TOEWIJZEN
 ======================================== */
 
 function openAssignGoalDialog() {
@@ -889,6 +798,10 @@ function openAssignGoalDialog() {
     getUnknownGoals();
 
   if (unknownGoals.length === 0) {
+    alert(
+      "Er zijn geen doelpunten zonder doelpuntenmaker."
+    );
+
     return;
   }
 
@@ -896,10 +809,6 @@ function openAssignGoalDialog() {
     document.getElementById(
       "unknownGoalSelect"
     );
-
-  if (!goalSelect) {
-    return;
-  }
 
   goalSelect.innerHTML = "";
 
@@ -929,14 +838,14 @@ function openAssignGoalDialog() {
 
   document.getElementById(
     "assignGoalDialog"
-  )?.showModal();
+  ).showModal();
 }
 
 
 function closeAssignGoalDialog() {
   document.getElementById(
     "assignGoalDialog"
-  )?.close();
+  ).close();
 }
 
 
@@ -945,7 +854,7 @@ function assignGoalScorer() {
     Number(
       document.getElementById(
         "unknownGoalSelect"
-      )?.value
+      ).value
     );
 
   const player =
@@ -974,6 +883,7 @@ function assignGoalScorer() {
     );
 
     closeAssignGoalDialog();
+
     return;
   }
 
@@ -1002,330 +912,112 @@ De ${goal.scoreA}-${goal.scoreB} van Ulftse Boys werd gemaakt door ${player.naam
 ======================================== */
 
 function openScoreCorrectionDialog() {
-  const dialog =
-    document.getElementById(
-      "scoreCorrectionDialog"
-    );
+  const dialog = document.getElementById("scoreCorrectionDialog");
+  if (!dialog) return;
 
-  const inputA =
-    document.getElementById(
-      "scoreCorrectionA"
-    );
-
-  const inputB =
-    document.getElementById(
-      "scoreCorrectionB"
-    );
-
-  const teamAName =
-    document.getElementById(
-      "scoreCorrectionTeamAName"
-    );
-
-  const teamBName =
-    document.getElementById(
-      "scoreCorrectionTeamBName"
-    );
-
-  if (inputA) {
-    inputA.value = scoreA;
-  }
-
-  if (inputB) {
-    inputB.value = scoreB;
-  }
-
-  if (teamAName) {
-    teamAName.textContent =
-      getTeamName("teamA");
-  }
-
-  if (teamBName) {
-    teamBName.textContent =
-      getTeamName("teamB");
-  }
+  document.getElementById("correctionTeamAName").textContent = getTeamName("teamA");
+  document.getElementById("correctionTeamBName").textContent = getTeamName("teamB");
+  document.getElementById("correctionScoreA").value = scoreA;
+  document.getElementById("correctionScoreB").value = scoreB;
 
   renderCorrectionScorers();
-
-  dialog?.showModal();
+  dialog.showModal();
 }
-
 
 function closeScoreCorrectionDialog() {
-  document.getElementById(
-    "scoreCorrectionDialog"
-  )?.close();
+  document.getElementById("scoreCorrectionDialog")?.close();
 }
 
-
 function changeCorrectionScore(side, delta) {
-  const input =
-    document.getElementById(
-      side === "A"
-        ? "scoreCorrectionA"
-        : "scoreCorrectionB"
-    );
+  const input = document.getElementById(side === "A" ? "correctionScoreA" : "correctionScoreB");
+  if (!input) return;
 
-  if (!input) {
-    return;
-  }
-
-  const current =
-    Math.max(
-      0,
-      parseInt(input.value, 10) || 0
-    );
-
-  input.value =
-    Math.max(
-      0,
-      current + delta
-    );
-
+  const current = Math.max(0, parseInt(input.value, 10) || 0);
+  input.value = Math.max(0, current + delta);
   renderCorrectionScorers();
 }
 
-
 function getCorrectionOwnScore() {
-  const teamAId =
-    document.getElementById("teamA")?.value;
-
-  const inputA =
-    document.getElementById(
-      "scoreCorrectionA"
-    );
-
-  const inputB =
-    document.getElementById(
-      "scoreCorrectionB"
-    );
-
-  const correctedA =
-    Math.max(
-      0,
-      parseInt(inputA?.value, 10) || 0
-    );
-
-  const correctedB =
-    Math.max(
-      0,
-      parseInt(inputB?.value, 10) || 0
-    );
-
-  return teamAId === ownClubId
-    ? correctedA
-    : correctedB;
+  const teamAId = document.getElementById("teamA").value;
+  const a = Math.max(0, parseInt(document.getElementById("correctionScoreA").value, 10) || 0);
+  const b = Math.max(0, parseInt(document.getElementById("correctionScoreB").value, 10) || 0);
+  return teamAId === ownClubId ? a : b;
 }
 
-
 function renderCorrectionScorers() {
-  const container =
-    document.getElementById(
-      "correctionScorers"
-    );
+  const container = document.getElementById("correctionScorers");
+  if (!container) return;
 
-  if (!container) {
-    return;
-  }
-
-  const requiredGoals =
-    getCorrectionOwnScore();
-
-  const ownClubPlayers =
-    getOwnClubPlayers();
+  const requiredGoals = getCorrectionOwnScore();
+  const previousValues = Array.from(container.querySelectorAll("select")).map(select => select.value);
+  const clubPlayers = players.filter(player => player.teamId === ownClubId);
 
   container.innerHTML = "";
 
   if (requiredGoals === 0) {
-    const text =
-      document.createElement("p");
-
-    text.className =
-      "correction-no-goals";
-
-    text.textContent =
-      "Geen doelpunten van Ulftse Boys.";
-
+    const text = document.createElement("p");
+    text.className = "correction-empty";
+    text.textContent = "Geen doelpunten van Ulftse Boys.";
     container.appendChild(text);
     return;
   }
 
-  const title =
-    document.createElement("h4");
+  for (let i = 0; i < requiredGoals; i++) {
+    const row = document.createElement("label");
+    row.textContent = `Goal ${i + 1} Ulftse Boys:`;
 
-  title.textContent =
-    "Doelpunten Ulftse Boys";
+    const select = document.createElement("select");
+    select.className = "correction-scorer";
+    select.dataset.goalIndex = i;
+    select.add(new Option("Onbekend", ""));
 
-  container.appendChild(title);
-
-  for (
-    let i = 0;
-    i < requiredGoals;
-    i++
-  ) {
-    const label =
-      document.createElement("label");
-
-    label.textContent =
-      `Goal ${i + 1}:`;
-
-    const select =
-      document.createElement("select");
-
-    select.className =
-      "correction-scorer";
-
-    select.dataset.goalIndex =
-      String(i);
-
-    select.add(
-      new Option(
-        "Onbekend",
-        ""
-      )
-    );
-
-    ownClubPlayers.forEach(player => {
-      select.add(
-        new Option(
-          player.naam,
-          player.id
-        )
-      );
+    clubPlayers.forEach(player => {
+      select.add(new Option(player.naam, player.id));
     });
 
-    const existingGoal =
-      ownGoals[i];
+    const existingValue = previousValues[i] !== undefined
+      ? previousValues[i]
+      : (ownGoals[i]?.playerId || "");
 
-    if (
-      existingGoal &&
-      existingGoal.playerId
-    ) {
-      select.value =
-        existingGoal.playerId;
-    } else {
-      select.value = "";
-    }
-
-    label.appendChild(select);
-    container.appendChild(label);
+    select.value = existingValue;
+    row.appendChild(select);
+    container.appendChild(row);
   }
 }
 
-
 function saveScoreCorrection() {
-  const inputA =
-    document.getElementById(
-      "scoreCorrectionA"
-    );
+  const newScoreA = Math.max(0, parseInt(document.getElementById("correctionScoreA").value, 10) || 0);
+  const newScoreB = Math.max(0, parseInt(document.getElementById("correctionScoreB").value, 10) || 0);
+  const teamAId = document.getElementById("teamA").value;
+  const ownScore = teamAId === ownClubId ? newScoreA : newScoreB;
+  const scorerSelects = Array.from(document.querySelectorAll("#correctionScorers .correction-scorer"));
 
-  const inputB =
-    document.getElementById(
-      "scoreCorrectionB"
-    );
+  const correctedGoals = [];
 
-  const newScoreA =
-    parseInt(inputA?.value, 10);
+  for (let i = 0; i < ownScore; i++) {
+    const select = scorerSelects[i];
+    const playerId = select?.value || null;
+    const player = playerId ? players.find(p => p.id === playerId) : null;
+    const existingGoal = ownGoals[i];
 
-  const newScoreB =
-    parseInt(inputB?.value, 10);
-
-  if (
-    !Number.isInteger(newScoreA) ||
-    !Number.isInteger(newScoreB) ||
-    newScoreA < 0 ||
-    newScoreB < 0
-  ) {
-    alert(
-      "Vul een geldige tussenstand in."
-    );
-
-    return;
+    correctedGoals.push({
+      id: existingGoal?.id || nextGoalId++,
+      minute: existingGoal?.minute ?? getCurrentMinute(),
+      minuteText: existingGoal?.minuteText || formatMatchMinute(getCurrentMinute()),
+      scoreA: existingGoal?.scoreA ?? null,
+      scoreB: existingGoal?.scoreB ?? null,
+      playerId: player ? player.id : null,
+      playerName: player ? player.naam : null
+    });
   }
 
   scoreA = newScoreA;
   scoreB = newScoreB;
-
-  const teamAId =
-    document.getElementById("teamA")?.value;
-
-  const ownScore =
-    teamAId === ownClubId
-      ? scoreA
-      : scoreB;
-
-  const scorerSelects =
-    Array.from(
-      document.querySelectorAll(
-        "#correctionScorers .correction-scorer"
-      )
-    );
-
-  const correctedGoals = [];
-
-  for (
-    let i = 0;
-    i < ownScore;
-    i++
-  ) {
-    const existingGoal =
-      ownGoals[i];
-
-    const select =
-      scorerSelects[i];
-
-    const playerId =
-      select?.value || null;
-
-    const player =
-      playerId
-        ? players.find(
-            item =>
-              item.id === playerId
-          )
-        : null;
-
-    correctedGoals.push({
-      id:
-        existingGoal?.id ||
-        nextGoalId++,
-
-      minute:
-        existingGoal?.minute ??
-        getCurrentMinute(),
-
-      minuteText:
-        existingGoal?.minuteText ||
-        formatMatchMinute(
-          getCurrentMinute()
-        ),
-
-      scoreA:
-        existingGoal?.scoreA ??
-        scoreA,
-
-      scoreB:
-        existingGoal?.scoreB ??
-        scoreB,
-
-      playerId:
-        player
-          ? player.id
-          : null,
-
-      playerName:
-        player
-          ? player.naam
-          : null
-    });
-  }
-
-  ownGoals =
-    correctedGoals;
+  ownGoals = correctedGoals;
+  lastGoal = null;
 
   updateScore();
   updateUnknownGoalReminder();
-
   closeScoreCorrectionDialog();
 
   createMessage(
@@ -1339,216 +1031,91 @@ ${getTeamName("teamA")} - ${getTeamName("teamB")} | ${scoreA}-${scoreB}`
   saveMatchState();
 }
 
-
 /* ========================================
-   WISSEL POPUP
+   WISSEL ULFTSE BOYS
 ======================================== */
 
 function openSubstitutionDialog() {
-  const container =
-    document.getElementById(
-      "substitutionRows"
-    );
-
-  if (!container) {
-    return;
-  }
-
+  const container = document.getElementById("substitutionRows");
+  if (!container) return;
   container.innerHTML = "";
-
   addSubstitutionRow();
-
-  document.getElementById(
-    "substitutionDialog"
-  )?.showModal();
+  document.getElementById("substitutionDialog")?.showModal();
 }
-
 
 function closeSubstitutionDialog() {
-  document.getElementById(
-    "substitutionDialog"
-  )?.close();
+  document.getElementById("substitutionDialog")?.close();
 }
 
-
 function addSubstitutionRow() {
-  const container =
-    document.getElementById(
-      "substitutionRows"
-    );
+  const container = document.getElementById("substitutionRows");
+  if (!container) return;
 
-  if (!container) {
-    return;
-  }
+  const clubPlayers = players.filter(player => player.teamId === ownClubId);
+  const row = document.createElement("div");
+  row.className = "substitution-row";
 
-  const ownClubPlayers =
-    getOwnClubPlayers();
+  const outLabel = document.createElement("label");
+  outLabel.textContent = "Speler eruit:";
+  const outSelect = document.createElement("select");
+  outSelect.className = "sub-player-out";
 
-  const row =
-    document.createElement("div");
+  const inLabel = document.createElement("label");
+  inLabel.textContent = "Speler erin:";
+  const inSelect = document.createElement("select");
+  inSelect.className = "sub-player-in";
 
-  row.className =
-    "substitution-row";
-
-  const outLabel =
-    document.createElement("label");
-
-  outLabel.textContent =
-    "Speler eruit:";
-
-  const outSelect =
-    document.createElement("select");
-
-  outSelect.className =
-    "sub-player-out";
-
-  ownClubPlayers.forEach(player => {
-    outSelect.add(
-      new Option(
-        player.naam,
-        player.id
-      )
-    );
+  clubPlayers.forEach(player => {
+    outSelect.add(new Option(player.naam, player.id));
+    inSelect.add(new Option(player.naam, player.id));
   });
 
   outLabel.appendChild(outSelect);
-
-
-  const inLabel =
-    document.createElement("label");
-
-  inLabel.textContent =
-    "Speler erin:";
-
-  const inSelect =
-    document.createElement("select");
-
-  inSelect.className =
-    "sub-player-in";
-
-  ownClubPlayers.forEach(player => {
-    inSelect.add(
-      new Option(
-        player.naam,
-        player.id
-      )
-    );
-  });
-
   inLabel.appendChild(inSelect);
-
-
-  const remove =
-    document.createElement("button");
-
-  remove.type = "button";
-  remove.className =
-    "remove-substitution danger";
-
-  remove.textContent =
-    "✕ Verwijderen";
-
-  remove.onclick = () => {
-    row.remove();
-
-    if (
-      container.children.length === 0
-    ) {
-      addSubstitutionRow();
-    }
-  };
-
-
   row.appendChild(outLabel);
   row.appendChild(inLabel);
-  row.appendChild(remove);
+
+  if (container.children.length > 0) {
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "remove-substitution";
+    remove.textContent = "✕ Wissel verwijderen";
+    remove.onclick = () => row.remove();
+    row.appendChild(remove);
+  }
 
   container.appendChild(row);
 }
 
-
 function saveSubstitutions() {
-  const rows =
-    Array.from(
-      document.querySelectorAll(
-        "#substitutionRows .substitution-row"
-      )
-    );
-
-  if (rows.length === 0) {
-    return;
-  }
+  const rows = Array.from(document.querySelectorAll("#substitutionRows .substitution-row"));
+  if (!rows.length) return;
 
   const substitutions = [];
 
   for (const row of rows) {
-    const outId =
-      row.querySelector(
-        ".sub-player-out"
-      )?.value;
+    const outId = row.querySelector(".sub-player-out")?.value;
+    const inId = row.querySelector(".sub-player-in")?.value;
+    const outPlayer = players.find(player => player.id === outId);
+    const inPlayer = players.find(player => player.id === inId);
 
-    const inId =
-      row.querySelector(
-        ".sub-player-in"
-      )?.value;
-
-    const outPlayer =
-      players.find(
-        player =>
-          player.id === outId
-      );
-
-    const inPlayer =
-      players.find(
-        player =>
-          player.id === inId
-      );
-
-    if (
-      !outPlayer ||
-      !inPlayer
-    ) {
-      alert(
-        "Kies bij iedere wissel een speler eruit en een speler erin."
-      );
-
+    if (!outPlayer || !inPlayer) {
+      alert("Kies bij iedere wissel een speler eruit en een speler erin.");
+      return;
+    }
+    if (outPlayer.id === inPlayer.id) {
+      alert("Speler eruit en erin mogen niet dezelfde speler zijn.");
       return;
     }
 
-    if (
-      outPlayer.id ===
-      inPlayer.id
-    ) {
-      alert(
-        `${outPlayer.naam} kan niet tegelijk eruit en erin.`
-      );
-
-      return;
-    }
-
-    substitutions.push({
-      outPlayer,
-      inPlayer
-    });
+    substitutions.push({ outPlayer, inPlayer });
   }
 
-  const minute =
-    getCurrentMinute();
-
-  const lines =
-    substitutions.map(
-      (item, index) => {
-        const prefix =
-          substitutions.length > 1
-            ? `Wissel ${index + 1}:\n`
-            : "";
-
-        return (
-`${prefix}Erin: ${item.inPlayer.naam} ➡️
-Eruit: ${item.outPlayer.naam} ⬅️`
-        );
-      }
-    );
+  const minute = getCurrentMinute();
+  const lines = substitutions.map((item, index) => {
+    const prefix = substitutions.length > 1 ? `Wissel ${index + 1}:\n` : "";
+    return `${prefix}Erin: ${item.inPlayer.naam} ➡️\nEruit: ${item.outPlayer.naam} ⬅️`;
+  });
 
   createMessage(
 `🔄 ${formatMatchMinute(minute)} | Wissel Ulftse Boys
@@ -1595,6 +1162,7 @@ function resetMatch(skipConfirm = false) {
   ownGoals = [];
   nextGoalId = 1;
 
+  resetGoalScorerSelect();
   updateUnknownGoalReminder();
 
   updateScore();
@@ -1603,25 +1171,14 @@ function resetMatch(skipConfirm = false) {
     "Nog niet gestart"
   );
 
-  const minuteElement =
-    document.getElementById(
-      "minute"
-    );
+  document.getElementById(
+    "minute"
+  ).textContent = "0'";
 
-  if (minuteElement) {
-    minuteElement.textContent =
-      "0'";
-  }
-
-  const preview =
-    document.getElementById(
-      "messagePreview"
-    );
-
-  if (preview) {
-    preview.textContent =
-      "Nog geen bericht.";
-  }
+  document.getElementById(
+    "messagePreview"
+  ).textContent =
+    "Nog geen bericht.";
 
   clearMediaPreview();
 
@@ -1634,38 +1191,20 @@ function resetMatch(skipConfirm = false) {
 ======================================== */
 
 function updateScore() {
-  const elementA =
-    document.getElementById(
-      "scoreA"
-    );
+  document.getElementById(
+    "scoreA"
+  ).textContent = scoreA;
 
-  const elementB =
-    document.getElementById(
-      "scoreB"
-    );
-
-  if (elementA) {
-    elementA.textContent =
-      scoreA;
-  }
-
-  if (elementB) {
-    elementB.textContent =
-      scoreB;
-  }
+  document.getElementById(
+    "scoreB"
+  ).textContent = scoreB;
 }
 
 
 function setStatus(text) {
-  const element =
-    document.getElementById(
-      "status"
-    );
-
-  if (element) {
-    element.textContent =
-      text;
-  }
+  document.getElementById(
+    "status"
+  ).textContent = text;
 }
 
 
@@ -1700,16 +1239,9 @@ function updateStatusFromMatchState() {
 
 function startTimerDisplay() {
   const updateMinuteDisplay = () => {
-    const minuteElement =
-      document.getElementById(
-        "minute"
-      );
-
-    if (!minuteElement) {
-      return;
-    }
-
-    minuteElement.textContent =
+    document.getElementById(
+      "minute"
+    ).textContent =
       formatMatchMinute(
         getCurrentMinute()
       );
@@ -1725,10 +1257,7 @@ function startTimerDisplay() {
 
 
 function getCurrentRawMinute() {
-  if (
-    matchStatus ===
-    "not_started"
-  ) {
+  if (matchStatus === "not_started") {
     return 0;
   }
 
@@ -1739,10 +1268,7 @@ function getCurrentRawMinute() {
     return pausedMinute;
   }
 
-  if (
-    matchStatus ===
-    "first_half"
-  ) {
+  if (matchStatus === "first_half") {
     if (!firstHalfStartedAt) {
       return pausedMinute || 0;
     }
@@ -1753,16 +1279,11 @@ function getCurrentRawMinute() {
 
     return Math.max(
       1,
-      Math.ceil(
-        diff / 60000
-      )
+      Math.ceil(diff / 60000)
     );
   }
 
-  if (
-    matchStatus ===
-    "second_half"
-  ) {
+  if (matchStatus === "second_half") {
     if (!secondHalfStartedAt) {
       return pausedMinute || 45;
     }
@@ -1775,9 +1296,7 @@ function getCurrentRawMinute() {
       45 +
       Math.max(
         1,
-        Math.ceil(
-          diff / 60000
-        )
+        Math.ceil(diff / 60000)
       )
     );
   }
@@ -1798,30 +1317,22 @@ function formatMatchMinute(minute) {
 
   if (
     (
-      matchStatus ===
-        "first_half" ||
-      matchStatus ===
-        "half_time"
+      matchStatus === "first_half" ||
+      matchStatus === "half_time"
     ) &&
     minute > 45
   ) {
-    return (
-      `45+${minute - 45}'`
-    );
+    return `45+${minute - 45}'`;
   }
 
   if (
     (
-      matchStatus ===
-        "second_half" ||
-      matchStatus ===
-        "ended"
+      matchStatus === "second_half" ||
+      matchStatus === "ended"
     ) &&
     minute > 90
   ) {
-    return (
-      `90+${minute - 90}'`
-    );
+    return `90+${minute - 90}'`;
   }
 
   return `${minute}'`;
@@ -1840,24 +1351,16 @@ function createMessage(
   currentMessage = text;
 
   currentMediaPath =
-    normalizeMediaPath(
-      mediaPath
-    );
+    normalizeMediaPath(mediaPath);
 
   currentFallbackMediaPath =
     normalizeMediaPath(
       fallbackMediaPath
     );
 
-  const preview =
-    document.getElementById(
-      "messagePreview"
-    );
-
-  if (preview) {
-    preview.textContent =
-      text;
-  }
+  document.getElementById(
+    "messagePreview"
+  ).textContent = text;
 
   showMediaPreview(
     currentMediaPath,
@@ -1867,17 +1370,10 @@ function createMessage(
 
 
 function restoreMessagePreview() {
-  const preview =
+  if (currentMessage) {
     document.getElementById(
       "messagePreview"
-    );
-
-  if (!preview) {
-    return;
-  }
-
-  if (currentMessage) {
-    preview.textContent =
+    ).textContent =
       currentMessage;
 
     showMediaPreview(
@@ -1886,7 +1382,9 @@ function restoreMessagePreview() {
     );
 
   } else {
-    preview.textContent =
+    document.getElementById(
+      "messagePreview"
+    ).textContent =
       "Nog geen bericht.";
 
     clearMediaPreview();
@@ -1905,29 +1403,20 @@ function showMediaPreview(
   fallbackPath = null
 ) {
   const primary =
-    normalizeMediaPath(
-      primaryPath
-    );
+    normalizeMediaPath(primaryPath);
 
   const fallback =
-    normalizeMediaPath(
-      fallbackPath
-    );
+    normalizeMediaPath(fallbackPath);
 
   clearMediaPreview();
 
-  if (
-    !primary &&
-    !fallback
-  ) {
+  if (!primary && !fallback) {
     return;
   }
 
   showSingleMediaPreview(
     primary || fallback,
-    primary
-      ? fallback
-      : null
+    primary ? fallback : null
   );
 }
 
@@ -1957,10 +1446,7 @@ function showSingleMediaPreview(
     );
 
   if (isVideoPath(path)) {
-    if (
-      !video ||
-      !videoWrap
-    ) {
+    if (!video || !videoWrap) {
       console.warn(
         "Video preview-element ontbreekt in index.html."
       );
@@ -1989,10 +1475,7 @@ function showSingleMediaPreview(
 
       video.onerror = null;
 
-      video.removeAttribute(
-        "src"
-      );
-
+      video.removeAttribute("src");
       video.load();
 
       videoWrap.classList.add(
@@ -2016,10 +1499,7 @@ function showSingleMediaPreview(
     return;
   }
 
-  if (
-    !img ||
-    !photoWrap
-  ) {
+  if (!img || !photoWrap) {
     return;
   }
 
@@ -2184,9 +1664,7 @@ async function getShareableMediaFile(path) {
       )
     ) {
       mediaType =
-        mimeByExtension[
-          extension
-        ] || "";
+        mimeByExtension[extension] || "";
     }
 
     if (
@@ -2249,6 +1727,11 @@ function canShareFile(file) {
     return false;
   }
 
+  /*
+    Sommige browsers hebben navigator.share
+    maar geen navigator.canShare.
+  */
+
   if (!navigator.canShare) {
     return true;
   }
@@ -2270,7 +1753,7 @@ function canShareFile(file) {
 
 
 /* ========================================
-   ÉÉN MEDIA-BESTAND DELEN
+   ÉÉN MEDIA-BESTAND PROBEREN TE DELEN
 ======================================== */
 
 async function tryShareWithMedia(
@@ -2301,12 +1784,9 @@ async function tryShareWithMedia(
     console.warn(
       `${label}: browser meldt dat dit bestand niet deelbaar is.`,
       {
-        name:
-          file.name,
-        type:
-          file.type,
-        size:
-          file.size
+        name: file.name,
+        type: file.type,
+        size: file.size
       }
     );
 
@@ -2315,19 +1795,29 @@ async function tryShareWithMedia(
 
   try {
     await navigator.share({
-      text:
-        currentMessage,
-      files:
-        [file]
+      text: currentMessage,
+      files: [file]
     });
+
+    /*
+      Als navigator.share zonder fout
+      terugkomt, is het delen afgerond.
+    */
 
     return true;
 
   } catch (error) {
+    /*
+      AbortError betekent normaal dat de
+      gebruiker zelf het deelvenster sloot.
+
+      Dan willen we NIET automatisch daarna
+      de foto of tekst openen.
+    */
+
     if (
       error &&
-      error.name ===
-        "AbortError"
+      error.name === "AbortError"
     ) {
       throw error;
     }
@@ -2361,8 +1851,7 @@ async function shareTextOnly() {
   if (navigator.share) {
     try {
       await navigator.share({
-        text:
-          currentMessage
+        text: currentMessage
       });
 
       return true;
@@ -2370,8 +1859,7 @@ async function shareTextOnly() {
     } catch (error) {
       if (
         error &&
-        error.name ===
-          "AbortError"
+        error.name === "AbortError"
       ) {
         throw error;
       }
@@ -2389,6 +1877,18 @@ async function shareTextOnly() {
 
 /* ========================================
    DELEN VIA WHATSAPP / DEELMENU
+
+   VOLGORDE:
+
+   1. Primaire media
+      bijvoorbeeld goalvideo
+
+   2. Fallback-media
+      bijvoorbeeld spelersfoto
+
+   3. Alleen tekst
+
+   4. Tekst naar klembord
 ======================================== */
 
 async function shareWhatsApp() {
@@ -2401,6 +1901,14 @@ async function shareWhatsApp() {
   }
 
   try {
+    /*
+      STAP 1:
+      probeer primaire media.
+
+      Bij een goal waarbij UB gelijk
+      of voor staat is dit de video.
+    */
+
     if (currentMediaPath) {
       const primaryShared =
         await tryShareWithMedia(
@@ -2412,6 +1920,14 @@ async function shareWhatsApp() {
         return;
       }
     }
+
+
+    /*
+      STAP 2:
+      primaire media werkte niet.
+
+      Probeer de fallback-foto.
+    */
 
     if (
       currentFallbackMediaPath &&
@@ -2429,12 +1945,28 @@ async function shareWhatsApp() {
       }
     }
 
+
+    /*
+      STAP 3:
+      geen media kunnen delen.
+
+      Probeer het bericht zonder media.
+    */
+
     const textShared =
       await shareTextOnly();
 
     if (textShared) {
       return;
     }
+
+
+    /*
+      STAP 4:
+      zelfs Web Share werkt niet.
+
+      Kopieer bericht.
+    */
 
     await navigator.clipboard.writeText(
       currentMessage
@@ -2445,10 +1977,14 @@ async function shareWhatsApp() {
     );
 
   } catch (error) {
+    /*
+      Gebruiker heeft zelf het
+      Android/iOS-deelvenster gesloten.
+    */
+
     if (
       error &&
-      error.name ===
-        "AbortError"
+      error.name === "AbortError"
     ) {
       return;
     }
@@ -2507,14 +2043,10 @@ function updateClock() {
     new Date();
 
   const dateOptions = {
-    weekday:
-      "long",
-    day:
-      "numeric",
-    month:
-      "long",
-    year:
-      "numeric"
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric"
   };
 
   let dateString =
